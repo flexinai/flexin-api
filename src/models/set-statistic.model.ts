@@ -1,4 +1,6 @@
-import {Entity, model, property} from '@loopback/repository';
+import {Entity, model, property, belongsTo} from '@loopback/repository';
+import {Workout} from './workout.model';
+import {Program} from './program.model';
 
 @model()
 export class SetStatistic extends Entity {
@@ -25,11 +27,11 @@ export class SetStatistic extends Entity {
     type: 'number',
   })
   weight?: number;
+  @belongsTo(() => Workout)
+  workoutId: number;
 
-  @property({
-    type: 'number',
-  })
-  programId?: number;
+  @belongsTo(() => Program)
+  programId: number;
 
   constructor(data?: Partial<SetStatistic>) {
     super(data);

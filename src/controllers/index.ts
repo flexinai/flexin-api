@@ -24,3 +24,7 @@ export * from './program-workout.controller';
 export * from './program-set-statistic.controller';
 export * from './program-playlist.controller';
 export * from './program-user.controller';
+export * from './set-statistic-workout.controller';
+export * from './set-statistic-program.controller';
+export * from './playlist-program.controller';
+export * from './category-user.controller';

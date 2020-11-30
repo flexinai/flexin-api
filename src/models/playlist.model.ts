@@ -1,4 +1,5 @@
-import {Entity, model, property} from '@loopback/repository';
+import {Entity, model, property, belongsTo} from '@loopback/repository';
+import {Program} from './program.model';
 
 @model()
 export class Playlist extends Entity {
@@ -20,10 +21,8 @@ export class Playlist extends Entity {
   })
   week?: number;
 
-  @property({
-    type: 'number',
-  })
-  programId?: number;
+  @belongsTo(() => Program)
+  programId: number;
 
   constructor(data?: Partial<Playlist>) {
     super(data);
