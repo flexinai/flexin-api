@@ -1,4 +1,6 @@
-import {Entity, model, property} from '@loopback/repository';
+import {Entity, model, property, belongsTo} from '@loopback/repository';
+import {Program} from './program.model';
+import {Food} from './food.model';
 
 @model()
 export class Meal extends Entity {
@@ -27,6 +29,19 @@ export class Meal extends Entity {
   })
   order: number;
 
+  @belongsTo(() => Program)
+  programId: number;
+
+  @belongsTo(() => Food)
+  foodId: number;
+
+  @belongsTo(() => Food)
+  chosenFoodId: number;
+
+  @property({
+    type: 'number',
+  })
+  mealPlanId?: number;
 
   constructor(data?: Partial<Meal>) {
     super(data);
