@@ -84,6 +84,11 @@ export class Workout extends Entity {
   })
   athleteNotes?: string;
 
+  @property({
+    type: 'number',
+  })
+  programId?: number;
+
   constructor(data?: Partial<Workout>) {
     super(data);
   }

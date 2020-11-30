@@ -1,4 +1,8 @@
-import {Entity, model, property} from '@loopback/repository';
+import {Entity, model, property, hasMany, hasOne, belongsTo} from '@loopback/repository';
+import {Workout} from './workout.model';
+import {SetStatistic} from './set-statistic.model';
+import {Playlist} from './playlist.model';
+import {User} from './user.model';
 
 @model()
 export class Program extends Entity {
@@ -15,6 +19,20 @@ export class Program extends Entity {
   })
   number: number;
 
+  @hasMany(() => Workout)
+  workouts: Workout[];
+
+  @hasMany(() => SetStatistic)
+  setStatistics: SetStatistic[];
+
+  @hasOne(() => Playlist)
+  playlist: Playlist;
+
+  @belongsTo(() => User)
+  createdById: number;
+
+  @belongsTo(() => User)
+  assignedToId: number;
 
   constructor(data?: Partial<Program>) {
     super(data);

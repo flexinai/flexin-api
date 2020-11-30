@@ -26,6 +26,10 @@ export class SetStatistic extends Entity {
   })
   weight?: number;
 
+  @property({
+    type: 'number',
+  })
+  programId?: number;
 
   constructor(data?: Partial<SetStatistic>) {
     super(data);

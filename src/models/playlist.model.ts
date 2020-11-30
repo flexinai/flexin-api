@@ -20,6 +20,10 @@ export class Playlist extends Entity {
   })
   week?: number;
 
+  @property({
+    type: 'number',
+  })
+  programId?: number;
 
   constructor(data?: Partial<Playlist>) {
     super(data);
