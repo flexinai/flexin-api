@@ -11,3 +11,4 @@ export * from './set-statistic.repository';
 export * from './set.repository';
 export * from './user.repository';
 export * from './workout.repository';
+export * from './exercise-category.repository';

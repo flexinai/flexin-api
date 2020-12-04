@@ -33,3 +33,7 @@ export * from './workout-exercise.controller';
 export * from './workout-set.controller';
 export * from './workout-intensity.controller';
 export * from './workout-set-statistic.controller';
+export * from './exercise-category.controller';
+export * from './exercise-intensity.controller';
+export * from './exercise-demonstration-video.controller';
+export * from './exercise-user.controller';

@@ -1,4 +1,9 @@
-import {Entity, model, property} from '@loopback/repository';
+import {Entity, model, property, hasMany, belongsTo} from '@loopback/repository';
+import {Category} from './category.model';
+import {ExerciseCategory} from './exercise-category.model';
+import {Intensity} from './intensity.model';
+import {DemonstrationVideo} from './demonstration-video.model';
+import {User} from './user.model';
 
 @model()
 export class Exercise extends Entity {
@@ -27,6 +32,17 @@ export class Exercise extends Entity {
   })
   measuredBy: string;
 
+  @hasMany(() => Category, {through: {model: () => ExerciseCategory}})
+  categories: Category[];
+
+  @hasMany(() => Intensity)
+  intensities: Intensity[];
+
+  @hasMany(() => DemonstrationVideo)
+  demonstrationVideos: DemonstrationVideo[];
+
+  @belongsTo(() => User)
+  createdById: number;
 
   constructor(data?: Partial<Exercise>) {
     super(data);

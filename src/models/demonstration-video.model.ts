@@ -21,6 +21,10 @@ export class DemonstrationVideo extends Entity {
   })
   url: string;
 
+  @property({
+    type: 'number',
+  })
+  exerciseId?: number;
 
   constructor(data?: Partial<DemonstrationVideo>) {
     super(data);
