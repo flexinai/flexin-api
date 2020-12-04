@@ -28,3 +28,8 @@ export * from './set-statistic-workout.controller';
 export * from './set-statistic-program.controller';
 export * from './playlist-program.controller';
 export * from './category-user.controller';
+export * from './workout-program.controller';
+export * from './workout-exercise.controller';
+export * from './workout-set.controller';
+export * from './workout-intensity.controller';
+export * from './workout-set-statistic.controller';

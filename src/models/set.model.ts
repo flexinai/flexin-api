@@ -33,6 +33,10 @@ export class Set extends Entity {
   })
   reps: number;
 
+  @property({
+    type: 'number',
+  })
+  workoutId?: number;
 
   constructor(data?: Partial<Set>) {
     super(data);
