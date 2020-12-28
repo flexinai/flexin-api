@@ -37,3 +37,5 @@ export * from './exercise-category.controller';
 export * from './exercise-intensity.controller';
 export * from './exercise-demonstration-video.controller';
 export * from './exercise-user.controller';
+export * from './oauth2.controller';
+export * from './who-am-i.controller';

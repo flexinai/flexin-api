@@ -12,3 +12,5 @@ export * from './set-statistic.model';
 export * from './playlist.model';
 export * from './category.model';
 export * from './exercise-category.model';
+export * from './user-credentials.model';
+export * from './user-identity.model';

@@ -12,3 +12,5 @@ export * from './set.repository';
 export * from './user.repository';
 export * from './workout.repository';
 export * from './exercise-category.repository';
+export * from './user-credentials.repository';
+export * from './user-identity.repository';
