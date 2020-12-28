@@ -1,4 +1,11 @@
-import {Entity, model, property} from '@loopback/repository';
+// Copyright IBM Corp. 2020. All Rights Reserved.
+// Node module: @loopback/example-passport-login
+// This file is licensed under the MIT License.
+// License text available at https://opensource.org/licenses/MIT
+
+import {Entity, model, property, hasOne, hasMany} from '@loopback/repository';
+import {UserCredentials} from './user-credentials.model';
+import {UserIdentity} from './user-identity.model';
 
 @model()
 export class User extends Entity {
@@ -7,7 +14,7 @@ export class User extends Entity {
     id: true,
     generated: true,
   })
-  id?: number;
+  id: number;
 
   @property({
     type: 'string',
@@ -17,37 +24,39 @@ export class User extends Entity {
 
   @property({
     type: 'string',
-    required: true,
   })
-  realm: string;
+  realm?: string;
 
+  // must keep it
   @property({
     type: 'string',
     required: true,
+    index: {unique: true},
   })
   username: string;
 
+  // must keep it
   @property({
     type: 'string',
-    default: '',
+    required: true,
   })
-  verificationToken: string;
+  email: string;
 
   @property({
     type: 'boolean',
-    required: true,
   })
-  emailVerified: boolean;
+  emailVerified?: boolean;
 
   @property({
     type: 'string',
   })
-  role?: string;
+  verificationToken?: string;
 
-  @property({
-    type: 'string',
-  })
-  instagramUsername?: string;
+  @hasOne(() => UserCredentials)
+  credentials?: UserCredentials;
+
+  @hasMany(() => UserIdentity)
+  profiles?: UserIdentity[];
 
   constructor(data?: Partial<User>) {
     super(data);
