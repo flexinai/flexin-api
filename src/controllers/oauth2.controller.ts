@@ -17,16 +17,11 @@ import {
   RestBindings,
 } from '@loopback/rest';
 import {SecurityBindings, UserProfile} from '@loopback/security';
-import {oAuth2InterceptExpressMiddleware} from '../authentication-interceptors/types';
 import {TokenServiceBindings} from '@loopback/authentication-jwt';
 
 /**
  * Login controller for third party oauth provider
  *
- * This controller demonstrates using passport strategies both as express middleware and as an independent strategy
- *
- * The method loginToThirdParty uses the @authenticate decorator to plugin passport strategies independently
- * The method thirdPartyCallBack uses the passport strategies as express middleware
  */
 export class Oauth2Controller {
   constructor(
@@ -57,14 +52,15 @@ export class Oauth2Controller {
     return response;
   }
 
-  @oAuth2InterceptExpressMiddleware()
+  // @oAuth2InterceptExpressMiddleware()
+  @authenticate('oauth2')
   @get('/auth/thirdparty/{provider}/callback')
   /**
-   * This method uses the passport strategies as express middleware
+   * This method uses the @authenticate decorator to plugin passport strategies independently
    *
    * Endpoint: '/auth/thirdparty/{provider}/callback'
    *          an endpoint which serves as a oauth2 callback for the thirdparty app
-   *          this endpoint sets the user profile in the session
+   *          this endpoint generates a jwt and redirects to the client account page
    */
   async thirdPartyCallBack(
     @param.path.string('provider') provider: string,

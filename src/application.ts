@@ -12,32 +12,18 @@ import {MySequence} from './sequence';
 
 // --- Authentication ----
 import {createBindingFromClass} from '@loopback/core';
-import {toInterceptor} from '@loopback/rest';
 import {AuthenticationComponent} from '@loopback/authentication';
-import {
-  CustomOauth2Interceptor,
-  GoogleOauthInterceptor,
-  SessionAuth,
-} from './authentication-interceptors';
 import {
   Oauth2AuthStrategy,
   GoogleOauth2Authentication,
-  SessionStrategy,
 } from './authentication-strategies';
-import {
-  CustomOauth2,
-  CustomOauth2ExpressMiddleware,
-  GoogleOauth,
-  GoogleOauth2ExpressMiddleware,
-} from './authentication-strategy-providers';
+import {CustomOauth2, GoogleOauth} from './authentication-strategy-providers';
 import {PassportUserIdentityService, UserServiceBindings} from './services';
 import passport from 'passport';
 import {
   JWTAuthenticationComponent,
   TokenServiceBindings,
 } from '@loopback/authentication-jwt';
-// CrudRestComponent for User controller
-import {CrudRestComponent} from '@loopback/rest-crud';
 // ----------------------
 
 export {ApplicationConfig};
@@ -56,7 +42,6 @@ export class FlexinApiApplication extends BootMixin(
     oAuth2Providers['google-login'].clientSecret = process.env.CLIENT_SECRET;
 
     this.component(AuthenticationComponent);
-    this.component(CrudRestComponent);
     this.component(JWTAuthenticationComponent);
     this.setUpBindings();
 
@@ -108,26 +93,8 @@ export class FlexinApiApplication extends BootMixin(
     // passport strategies
     this.add(createBindingFromClass(GoogleOauth, {key: 'googleStrategy'}));
     this.add(createBindingFromClass(CustomOauth2, {key: 'oauth2Strategy'}));
-    // passport express middleware
-    this.add(
-      createBindingFromClass(GoogleOauth2ExpressMiddleware, {
-        key: 'googleStrategyMiddleware',
-      }),
-    );
-    this.add(
-      createBindingFromClass(CustomOauth2ExpressMiddleware, {
-        key: 'oauth2StrategyMiddleware',
-      }),
-    );
     // LoopBack 4 style authentication strategies
     this.add(createBindingFromClass(GoogleOauth2Authentication));
     this.add(createBindingFromClass(Oauth2AuthStrategy));
-    this.add(createBindingFromClass(SessionStrategy));
-    // Express style middleware interceptors
-    this.bind('passport-init-mw').to(toInterceptor(passport.initialize()));
-    this.bind('passport-session-mw').to(toInterceptor(passport.session()));
-    this.bind('passport-google').toProvider(GoogleOauthInterceptor);
-    this.bind('passport-oauth2').toProvider(CustomOauth2Interceptor);
-    this.bind('set-session-user').toProvider(SessionAuth);
   }
 }
