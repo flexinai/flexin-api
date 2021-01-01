@@ -1,31 +1,25 @@
+import {Count, CountSchema, Filter, repository, Where} from '@loopback/repository';
 import {
-  Count,
-  CountSchema,
-  Filter,
-  repository,
-  Where,
-} from '@loopback/repository';
-  import {
   del,
   get,
   getModelSchemaRef,
   getWhereSchemaFor,
+  HttpErrors,
   param,
   patch,
   post,
   requestBody,
 } from '@loopback/rest';
-import {
-Exercise,
-ExerciseCategory,
-Category,
-} from '../models';
-import {ExerciseRepository} from '../repositories';
+import {Exercise, ExerciseCategory, Category} from '../models';
+import {ExerciseRepository, ExerciseCategoryRepository} from '../repositories';
 
 export class ExerciseCategoryController {
   constructor(
-    @repository(ExerciseRepository) protected exerciseRepository: ExerciseRepository,
-  ) { }
+    @repository(ExerciseRepository)
+    protected exerciseRepository: ExerciseRepository,
+    @repository(ExerciseCategoryRepository)
+    protected exerciseCategoryRepository: ExerciseCategoryRepository,
+  ) {}
 
   @get('/exercises/{id}/categories', {
     responses: {
@@ -106,5 +100,65 @@ export class ExerciseCategoryController {
     @param.query.object('where', getWhereSchemaFor(Category)) where?: Where<Category>,
   ): Promise<Count> {
     return this.exerciseRepository.categories(id).delete(where);
+  }
+
+  /* create a link between an existing exercise and category */
+  @post('/exercises-categories', {
+    responses: {
+      '204': {
+        description: 'Exercise-Category link success',
+      },
+    },
+  })
+  async link(
+    @requestBody({
+      content: {
+        'application/json': {
+          schema: getModelSchemaRef(ExerciseCategory, {
+            title: 'NewExerciseCategory',
+            exclude: ['id'],
+          }),
+        },
+      },
+    })
+    exerciseCategory: Omit<ExerciseCategory, 'id'>,
+  ): Promise<void> {
+    return this.exerciseRepository.categories(exerciseCategory.exerciseId).link(exerciseCategory.categoryId);
+  }
+
+  /* delete a link between an existing exercise and category */
+  @del('/exercises-categories', {
+    responses: {
+      '204': {
+        description: 'Exercise-Category unlink success',
+      },
+    },
+  })
+  async unlink(
+    @requestBody({
+      content: {
+        'application/json': {
+          schema: getModelSchemaRef(ExerciseCategory, {
+            title: 'NewExerciseCategory',
+            exclude: ['id'],
+          }),
+          required: ['exerciseId', 'categoryId'],
+        },
+      },
+    })
+    exerciseCategory: Omit<ExerciseCategory, 'id'>,
+  ): Promise<void> {
+    // create a filter looking for a link between exerciseId and categoryId
+    const filter: Filter<ExerciseCategory> = {
+      where: {
+        and: [{exerciseId: exerciseCategory.exerciseId}, {categoryId: exerciseCategory.categoryId}],
+      },
+    };
+    const linkToDelete = await this.exerciseCategoryRepository.findOne(filter);
+    if (linkToDelete) {
+      return this.exerciseCategoryRepository.deleteById(linkToDelete.id);
+    } else {
+      throw new HttpErrors.NotFound('ExerciseCategory link not found');
+    }
   }
 }
