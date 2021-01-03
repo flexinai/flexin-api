@@ -59,7 +59,8 @@ export class ExerciseCategoryController {
           }),
         },
       },
-    }) category: Omit<Category, 'id'>,
+    })
+    category: Omit<Category, 'id'>,
   ): Promise<Category> {
     return this.exerciseRepository.categories(id).create(category);
   }
@@ -103,7 +104,7 @@ export class ExerciseCategoryController {
   }
 
   /* create a link between an existing exercise and category */
-  @post('/exercises-categories', {
+  @patch('/exercises-categories', {
     responses: {
       '204': {
         description: 'Exercise-Category link success',
@@ -142,7 +143,6 @@ export class ExerciseCategoryController {
             title: 'NewExerciseCategory',
             exclude: ['id'],
           }),
-          required: ['exerciseId', 'categoryId'],
         },
       },
     })
