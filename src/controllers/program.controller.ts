@@ -18,11 +18,15 @@ import {
 } from '@loopback/rest';
 import {Program} from '../models';
 import {ProgramRepository} from '../repositories';
+import {inject} from '@loopback/core';
+import {authenticate} from '@loopback/authentication';
+import {SecurityBindings, securityId, UserProfile} from  '@loopback/security';
 
 export class ProgramController {
   constructor(
     @repository(ProgramRepository)
     public programRepository : ProgramRepository,
+    @inject(SecurityBindings.USER, {optional: true}) private user: UserProfile
   ) {}
 
   @post('/programs', {
@@ -169,5 +173,29 @@ export class ProgramController {
   })
   async deleteById(@param.path.number('id') id: number): Promise<void> {
     await this.programRepository.deleteById(id);
+  }
+
+  @authenticate('jwt')
+  @get('/myprograms', {
+    responses: {
+      '200': {
+        description: 'Array of Program model instances',
+        content: {
+          'application/json': {
+            schema: {
+              type: 'array',
+              items: getModelSchemaRef(Program, {includeRelations: true}),
+            },
+          },
+        },
+      },
+    },
+  })
+  async findCreatedOrAssigned(
+  ): Promise<Program[]> {
+    const filter = {
+      where: { createdById: this.user.id, }
+    }
+    return this.programRepository.find(filter);
   }
 }
