@@ -8,12 +8,13 @@ import {
   DefaultCrudRepository,
   HasManyRepositoryFactory,
   repository,
-  HasOneRepositoryFactory,
-} from '@loopback/repository';
+  HasOneRepositoryFactory, HasManyThroughRepositoryFactory} from '@loopback/repository';
 import {DbDataSource} from '../datasources';
-import {User, UserIdentity, UserCredentials} from '../models';
+import {User, UserIdentity, UserCredentials, Program, UserProgram} from '../models';
 import {UserIdentityRepository} from './user-identity.repository';
 import {UserCredentialsRepository} from './user-credentials.repository';
+import {UserProgramRepository} from './user-program.repository';
+import {ProgramRepository} from './program.repository';
 
 export class UserRepository extends DefaultCrudRepository<
   User,
@@ -29,14 +30,21 @@ export class UserRepository extends DefaultCrudRepository<
     typeof User.prototype.id
   >;
 
+  public readonly programs: HasManyThroughRepositoryFactory<Program, typeof Program.prototype.id,
+          UserProgram,
+          typeof User.prototype.id
+        >;
+
   constructor(
     @inject('datasources.db') dataSource: DbDataSource,
     @repository.getter('UserIdentityRepository')
     protected profilesGetter: Getter<UserIdentityRepository>,
     @repository.getter('UserCredentialsRepository')
-    protected credentialsGetter: Getter<UserCredentialsRepository>,
+    protected credentialsGetter: Getter<UserCredentialsRepository>, @repository.getter('UserProgramRepository') protected userProgramRepositoryGetter: Getter<UserProgramRepository>, @repository.getter('ProgramRepository') protected programRepositoryGetter: Getter<ProgramRepository>,
   ) {
     super(User, dataSource);
+    this.programs = this.createHasManyThroughRepositoryFactoryFor('programs', programRepositoryGetter, userProgramRepositoryGetter,);
+    this.registerInclusionResolver('programs', this.programs.inclusionResolver);
     this.profiles = this.createHasManyRepositoryFactoryFor(
       'profiles',
       profilesGetter,
