@@ -22,7 +22,7 @@ import {ProgramRepository} from '../repositories';
 export class ProgramController {
   constructor(
     @repository(ProgramRepository)
-    public programRepository : ProgramRepository,
+    public programRepository: ProgramRepository,
   ) {}
 
   @post('/programs', {
@@ -57,9 +57,7 @@ export class ProgramController {
       },
     },
   })
-  async count(
-    @param.where(Program) where?: Where<Program>,
-  ): Promise<Count> {
+  async count(@param.where(Program) where?: Where<Program>): Promise<Count> {
     return this.programRepository.count(where);
   }
 
@@ -78,9 +76,7 @@ export class ProgramController {
       },
     },
   })
-  async find(
-    @param.filter(Program) filter?: Filter<Program>,
-  ): Promise<Program[]> {
+  async find(@param.filter(Program) filter?: Filter<Program>): Promise<Program[]> {
     return this.programRepository.find(filter);
   }
 
@@ -120,7 +116,7 @@ export class ProgramController {
   })
   async findById(
     @param.path.number('id') id: number,
-    @param.filter(Program, {exclude: 'where'}) filter?: FilterExcludingWhere<Program>
+    @param.filter(Program, {exclude: 'where'}) filter?: FilterExcludingWhere<Program>,
   ): Promise<Program> {
     return this.programRepository.findById(id, filter);
   }
@@ -153,10 +149,7 @@ export class ProgramController {
       },
     },
   })
-  async replaceById(
-    @param.path.number('id') id: number,
-    @requestBody() program: Program,
-  ): Promise<void> {
+  async replaceById(@param.path.number('id') id: number, @requestBody() program: Program): Promise<void> {
     await this.programRepository.replaceById(id, program);
   }
 
