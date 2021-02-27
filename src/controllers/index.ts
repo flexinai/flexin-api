@@ -40,3 +40,5 @@ export * from './exercise-user.controller';
 export * from './oauth2.controller';
 export * from './self.controller';
 export * from './user-program.controller';
+export * from './clip.controller';
+export * from './set-statistic-clip.controller';
