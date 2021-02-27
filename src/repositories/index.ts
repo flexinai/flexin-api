@@ -15,3 +15,4 @@ export * from './exercise-category.repository';
 export * from './user-credentials.repository';
 export * from './user-identity.repository';
 export * from './user-program.repository';
+export * from './clip.repository';
