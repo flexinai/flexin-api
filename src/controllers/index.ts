@@ -42,3 +42,4 @@ export * from './self.controller';
 export * from './user-program.controller';
 export * from './clip.controller';
 export * from './set-statistic-clip.controller';
+export * from './clip-set-statistic.controller';

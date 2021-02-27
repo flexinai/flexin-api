@@ -1,4 +1,5 @@
-import {Entity, model, property} from '@loopback/repository';
+import {Entity, model, property, belongsTo} from '@loopback/repository';
+import {SetStatistic} from './set-statistic.model';
 
 @model()
 export class Clip extends Entity {
@@ -39,10 +40,8 @@ export class Clip extends Entity {
   })
   special: boolean;
 
-  @property({
-    type: 'number',
-  })
-  setStatisticId?: number;
+  @belongsTo(() => SetStatistic)
+  setStatisticId: number;
 
   constructor(data?: Partial<Clip>) {
     super(data);
