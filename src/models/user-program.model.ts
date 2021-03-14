@@ -11,13 +11,15 @@ export class UserProgram extends Entity {
 
   @property({
     type: 'number',
+    required: true,
   })
-  userId?: number;
+  userId: number;
 
   @property({
     type: 'number',
+    required: true,
   })
-  programId?: number;
+  programId: number;
 
   constructor(data?: Partial<UserProgram>) {
     super(data);
