@@ -18,11 +18,15 @@ import {
 } from '@loopback/rest';
 import {Program} from '../models';
 import {ProgramRepository} from '../repositories';
+import {inject} from '@loopback/core';
+import {authenticate} from '@loopback/authentication';
+import {SecurityBindings, securityId, UserProfile} from  '@loopback/security';
 
 export class ProgramController {
   constructor(
     @repository(ProgramRepository)
-    public programRepository: ProgramRepository,
+    public programRepository : ProgramRepository,
+    @inject(SecurityBindings.USER, {optional: true}) private user: UserProfile
   ) {}
 
   @post('/programs', {
@@ -57,7 +61,9 @@ export class ProgramController {
       },
     },
   })
-  async count(@param.where(Program) where?: Where<Program>): Promise<Count> {
+  async count(
+    @param.where(Program) where?: Where<Program>,
+  ): Promise<Count> {
     return this.programRepository.count(where);
   }
 
@@ -76,7 +82,9 @@ export class ProgramController {
       },
     },
   })
-  async find(@param.filter(Program) filter?: Filter<Program>): Promise<Program[]> {
+  async find(
+    @param.filter(Program) filter?: Filter<Program>,
+  ): Promise<Program[]> {
     return this.programRepository.find(filter);
   }
 
@@ -116,7 +124,7 @@ export class ProgramController {
   })
   async findById(
     @param.path.number('id') id: number,
-    @param.filter(Program, {exclude: 'where'}) filter?: FilterExcludingWhere<Program>,
+    @param.filter(Program, {exclude: 'where'}) filter?: FilterExcludingWhere<Program>
   ): Promise<Program> {
     return this.programRepository.findById(id, filter);
   }
@@ -149,7 +157,10 @@ export class ProgramController {
       },
     },
   })
-  async replaceById(@param.path.number('id') id: number, @requestBody() program: Program): Promise<void> {
+  async replaceById(
+    @param.path.number('id') id: number,
+    @requestBody() program: Program,
+  ): Promise<void> {
     await this.programRepository.replaceById(id, program);
   }
 
@@ -162,5 +173,29 @@ export class ProgramController {
   })
   async deleteById(@param.path.number('id') id: number): Promise<void> {
     await this.programRepository.deleteById(id);
+  }
+
+  @authenticate('jwt')
+  @get('/myprograms', {
+    responses: {
+      '200': {
+        description: 'Array of Program model instances',
+        content: {
+          'application/json': {
+            schema: {
+              type: 'array',
+              items: getModelSchemaRef(Program, {includeRelations: true}),
+            },
+          },
+        },
+      },
+    },
+  })
+  async findCreatedOrAssigned(
+  ): Promise<Program[]> {
+    const filter = {
+      where: { createdById: this.user.id, }
+    }
+    return this.programRepository.find(filter);
   }
 }

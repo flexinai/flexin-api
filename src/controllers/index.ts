@@ -39,7 +39,6 @@ export * from './exercise-demonstration-video.controller';
 export * from './exercise-user.controller';
 export * from './oauth2.controller';
 export * from './who-am-i.controller';
-export * from './self.controller';
 export * from './clip.controller';
 export * from './set-statistic-clip.controller';
 export * from './clip-set-statistic.controller';

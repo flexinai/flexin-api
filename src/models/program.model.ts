@@ -31,6 +31,9 @@ export class Program extends Entity {
   @belongsTo(() => User)
   createdById: number;
 
+  @belongsTo(() => User)
+  assignedToId: number;
+
   constructor(data?: Partial<Program>) {
     super(data);
   }
