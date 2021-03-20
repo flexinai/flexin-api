@@ -26,4 +26,22 @@ export class ProgramUserController {
   ): Promise<User> {
     return this.programRepository.createdBy(id);
   }
+
+  @get('/programs/{id}/assigned-to', {
+    responses: {
+      '200': {
+        description: 'User Program is assigned to',
+        content: {
+          'application/json': {
+            schema: {type: 'array', items: getModelSchemaRef(User)},
+          },
+        },
+      },
+    },
+  })
+  async getUser(
+    @param.path.number('id') id: typeof Program.prototype.id,
+  ): Promise<User> {
+    return this.programRepository.assignedTo(id);
+  }
 }
