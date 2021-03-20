@@ -6,8 +6,6 @@
 import {Entity, model, property, hasOne, hasMany} from '@loopback/repository';
 import {UserCredentials} from './user-credentials.model';
 import {UserIdentity} from './user-identity.model';
-import {Program} from './program.model';
-import {UserProgram} from './user-program.model';
 
 @model()
 export class User extends Entity {
@@ -54,8 +52,6 @@ export class User extends Entity {
   })
   verificationToken?: string;
 
-  @hasMany(() => Program, {through: {model: () => UserProgram}})
-  programs: Program[];
   @hasOne(() => UserCredentials)
   credentials?: UserCredentials;
 

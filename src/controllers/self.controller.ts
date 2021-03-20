@@ -28,7 +28,6 @@ export class SelfController {
     return userProfile;
   }
 
-  // programs created by or assigned to the current user
   @authenticate('jwt')
   @get('/self/programs', {
     responses: {
@@ -46,12 +45,9 @@ export class SelfController {
     },
   })
   async findCreatedOrAssigned(): Promise<Program[]> {
-    const createdByFilter = {
+    const filter = {
       where: {createdById: this.user.id},
     };
-    // get programs created by user
-    const programs = await this.programRepository.find(createdByFilter);
-    // add and return programs assigned to the current user
-    return programs.concat(await this.userRepository.programs(this.user.id).find());
+    return this.programRepository.find(filter);
   }
 }
