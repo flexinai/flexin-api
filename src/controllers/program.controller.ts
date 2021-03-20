@@ -176,10 +176,10 @@ export class ProgramController {
   }
 
   @authenticate('jwt')
-  @get('/myprograms', {
+  @get('/programs/self', {
     responses: {
       '200': {
-        description: 'Array of Program model instances',
+        description: 'Array of Program model instances assigned to or created by current user',
         content: {
           'application/json': {
             schema: {
@@ -194,8 +194,10 @@ export class ProgramController {
   async findCreatedOrAssigned(
   ): Promise<Program[]> {
     const filter = {
-      where: { createdById: this.user.id, }
-    }
+      where: {
+        or: [{createdById: this.user.id}, {assignedToId: this.user.id}],
+      },
+    };
     return this.programRepository.find(filter);
   }
 }
