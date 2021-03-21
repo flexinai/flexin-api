@@ -70,7 +70,7 @@ export class Oauth2Controller {
   ) {
     const jwt = await this.jwtService.generateToken(user);
     console.log('jwt token: ', jwt);
-    response.redirect(`https://flexin.io/auth/account/${jwt}`);
+    response.redirect(`https://app.flexin.io/auth/account/${jwt}`);
     return response;
   }
 }
