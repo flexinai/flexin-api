@@ -6,6 +6,10 @@
 import {Entity, model, property, hasOne, hasMany} from '@loopback/repository';
 import {UserCredentials} from './user-credentials.model';
 import {UserIdentity} from './user-identity.model';
+import {Category} from './category.model';
+import {Exercise} from './exercise.model';
+import {Intensity} from './intensity.model';
+import {Program} from './program.model';
 
 @model()
 export class User extends Entity {
@@ -52,6 +56,20 @@ export class User extends Entity {
   })
   verificationToken?: string;
 
+  @hasMany(() => Category, {keyTo: 'createdById'})
+  categoriesCreated: Category[];
+
+  @hasMany(() => Exercise, {keyTo: 'createdById'})
+  exercisesCreated: Exercise[];
+
+  @hasMany(() => Intensity, {keyTo: 'createdById'})
+  intensitiesCreated: Intensity[];
+
+  @hasMany(() => Program, {keyTo: 'createdById'})
+  programsCreated: Program[];
+
+  @hasMany(() => Program, {keyTo: 'assignedToId'})
+  programsAssigned: Program[];
   @hasOne(() => UserCredentials)
   credentials?: UserCredentials;
 
