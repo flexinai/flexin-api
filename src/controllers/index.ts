@@ -42,3 +42,6 @@ export * from './self.controller';
 export * from './clip.controller';
 export * from './set-statistic-clip.controller';
 export * from './clip-set-statistic.controller';
+export * from './user-category.controller';
+export * from './user-exercise.controller';
+export * from './user-intensity.controller';
