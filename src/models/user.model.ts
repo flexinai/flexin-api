@@ -65,6 +65,11 @@ export class User extends Entity {
   @hasMany(() => Intensity, {keyTo: 'createdById'})
   intensitiesCreated: Intensity[];
 
+  @hasMany(() => Program, {keyTo: 'createdById'})
+  programsCreated: Program[];
+
+  @hasMany(() => Program, {keyTo: 'assignedToId'})
+  programsAssigned: Program[];
   @hasOne(() => UserCredentials)
   credentials?: UserCredentials;
 

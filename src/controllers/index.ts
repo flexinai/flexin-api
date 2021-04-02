@@ -45,3 +45,5 @@ export * from './clip-set-statistic.controller';
 export * from './user-category.controller';
 export * from './user-exercise.controller';
 export * from './user-intensity.controller';
+export * from './user-program-creator.controller';
+export * from './user-program-assignee.controller';
