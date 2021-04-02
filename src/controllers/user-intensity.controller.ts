@@ -25,32 +25,6 @@ export class UserIntensityController {
     return this.userRepository.intensitiesCreated(id).find(filter);
   }
 
-  @post('/users/{id}/intensities-created', {
-    responses: {
-      '200': {
-        description: 'User model instance',
-        content: {'application/json': {schema: getModelSchemaRef(Intensity)}},
-      },
-    },
-  })
-  async create(
-    @param.path.number('id') id: typeof User.prototype.id,
-    @requestBody({
-      content: {
-        'application/json': {
-          schema: getModelSchemaRef(Intensity, {
-            title: 'NewIntensityInUser',
-            exclude: ['id'],
-            optional: ['createdById'],
-          }),
-        },
-      },
-    })
-    intensity: Omit<Intensity, 'id'>,
-  ): Promise<Intensity> {
-    return this.userRepository.intensitiesCreated(id).create(intensity);
-  }
-
   @patch('/users/{id}/intensities-created', {
     responses: {
       '200': {

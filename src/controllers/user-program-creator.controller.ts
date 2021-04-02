@@ -25,32 +25,6 @@ export class UserProgramCreatorController {
     return this.userRepository.programsCreated(id).find(filter);
   }
 
-  @post('/users/{id}/programs-created', {
-    responses: {
-      '200': {
-        description: 'User model instance',
-        content: {'application/json': {schema: getModelSchemaRef(Program)}},
-      },
-    },
-  })
-  async create(
-    @param.path.number('id') id: typeof User.prototype.id,
-    @requestBody({
-      content: {
-        'application/json': {
-          schema: getModelSchemaRef(Program, {
-            title: 'NewProgramInUser',
-            exclude: ['id'],
-            optional: ['createdById'],
-          }),
-        },
-      },
-    })
-    program: Omit<Program, 'id'>,
-  ): Promise<Program> {
-    return this.userRepository.programsCreated(id).create(program);
-  }
-
   @patch('/users/{id}/programs-created', {
     responses: {
       '200': {

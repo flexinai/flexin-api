@@ -25,32 +25,6 @@ export class UserExerciseController {
     return this.userRepository.exercisesCreated(id).find(filter);
   }
 
-  @post('/users/{id}/exercises-created', {
-    responses: {
-      '200': {
-        description: 'User model instance',
-        content: {'application/json': {schema: getModelSchemaRef(Exercise)}},
-      },
-    },
-  })
-  async create(
-    @param.path.number('id') id: typeof User.prototype.id,
-    @requestBody({
-      content: {
-        'application/json': {
-          schema: getModelSchemaRef(Exercise, {
-            title: 'NewExerciseInUser',
-            exclude: ['id'],
-            optional: ['createdById'],
-          }),
-        },
-      },
-    })
-    exercise: Omit<Exercise, 'id'>,
-  ): Promise<Exercise> {
-    return this.userRepository.exercisesCreated(id).create(exercise);
-  }
-
   @patch('/users/{id}/exercises-created', {
     responses: {
       '200': {

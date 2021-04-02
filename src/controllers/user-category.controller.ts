@@ -25,32 +25,6 @@ export class UserCategoryController {
     return this.userRepository.categoriesCreated(id).find(filter);
   }
 
-  @post('/users/{id}/categories-created', {
-    responses: {
-      '200': {
-        description: 'User model instance',
-        content: {'application/json': {schema: getModelSchemaRef(Category)}},
-      },
-    },
-  })
-  async create(
-    @param.path.number('id') id: typeof User.prototype.id,
-    @requestBody({
-      content: {
-        'application/json': {
-          schema: getModelSchemaRef(Category, {
-            title: 'NewCategoryInUser',
-            exclude: ['id'],
-            optional: ['createdById'],
-          }),
-        },
-      },
-    })
-    category: Omit<Category, 'id'>,
-  ): Promise<Category> {
-    return this.userRepository.categoriesCreated(id).create(category);
-  }
-
   @patch('/users/{id}/categories-created', {
     responses: {
       '200': {
