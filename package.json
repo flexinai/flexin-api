@@ -51,6 +51,7 @@
     "@loopback/authentication": "^7.1.0",
     "@loopback/authentication-jwt": "^0.8.0",
     "@loopback/authentication-passport": "^3.1.0",
+    "@loopback/authorization": "^0.8.1",
     "@loopback/boot": "^3.3.0",
     "@loopback/core": "^2.15.0",
     "@loopback/repository": "^3.5.0",

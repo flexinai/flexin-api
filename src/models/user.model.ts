@@ -56,6 +56,12 @@ export class User extends Entity {
   })
   verificationToken?: string;
 
+  @property({
+    type: 'array',
+    itemType: 'string',
+  })
+  roles?: string[];
+
   @hasMany(() => Category, {keyTo: 'createdById'})
   categoriesCreated: Category[];
 

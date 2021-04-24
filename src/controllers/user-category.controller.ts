@@ -2,10 +2,18 @@ import {Count, CountSchema, Filter, repository, Where} from '@loopback/repositor
 import {del, get, getModelSchemaRef, getWhereSchemaFor, param, patch, post, requestBody} from '@loopback/rest';
 import {User, Category} from '../models';
 import {UserRepository} from '../repositories';
+import {authenticate} from '@loopback/authentication';
+import {authorize} from '@loopback/authorization';
+import {basicAuthorization} from '../services';
 
 export class UserCategoryController {
   constructor(@repository(UserRepository) protected userRepository: UserRepository) {}
 
+  @authenticate('jwt')
+  @authorize({
+    allowedRoles: ['admin'],
+    voters: [basicAuthorization],
+  })
   @get('/users/{id}/categories-created', {
     responses: {
       '200': {
