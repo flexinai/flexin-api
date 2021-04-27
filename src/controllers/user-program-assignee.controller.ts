@@ -2,7 +2,15 @@ import {Count, CountSchema, Filter, repository, Where} from '@loopback/repositor
 import {del, get, getModelSchemaRef, getWhereSchemaFor, param, patch, post, requestBody} from '@loopback/rest';
 import {User, Program} from '../models';
 import {UserRepository} from '../repositories';
+import {authenticate} from '@loopback/authentication';
+import {authorize} from '@loopback/authorization';
+import {roleAndIdMatch} from '../services';
 
+@authenticate('jwt')
+@authorize({
+  allowedRoles: ['admin', 'user'],
+  voters: [roleAndIdMatch],
+})
 export class UserProgramAssigneeController {
   constructor(@repository(UserRepository) protected userRepository: UserRepository) {}
 

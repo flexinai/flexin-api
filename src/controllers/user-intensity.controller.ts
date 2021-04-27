@@ -2,7 +2,15 @@ import {Count, CountSchema, Filter, repository, Where} from '@loopback/repositor
 import {del, get, getModelSchemaRef, getWhereSchemaFor, param, patch, post, requestBody} from '@loopback/rest';
 import {User, Intensity} from '../models';
 import {UserRepository} from '../repositories';
+import {authenticate} from '@loopback/authentication';
+import {authorize} from '@loopback/authorization';
+import {roleAndIdMatch} from '../services';
 
+@authenticate('jwt')
+@authorize({
+  allowedRoles: ['admin', 'coach'],
+  voters: [roleAndIdMatch],
+})
 export class UserIntensityController {
   constructor(@repository(UserRepository) protected userRepository: UserRepository) {}
 

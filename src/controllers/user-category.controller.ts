@@ -4,16 +4,16 @@ import {User, Category} from '../models';
 import {UserRepository} from '../repositories';
 import {authenticate} from '@loopback/authentication';
 import {authorize} from '@loopback/authorization';
-import {roleMatch, roleAndIdMatch} from '../services';
+import {roleAndIdMatch} from '../services';
 
+@authenticate('jwt')
+@authorize({
+  allowedRoles: ['admin', 'coach'],
+  voters: [roleAndIdMatch],
+})
 export class UserCategoryController {
   constructor(@repository(UserRepository) protected userRepository: UserRepository) {}
 
-  @authenticate('jwt')
-  @authorize({
-    allowedRoles: ['admin', 'coach'],
-    voters: [roleMatch],
-  })
   @get('/users/{id}/categories-created', {
     responses: {
       '200': {
