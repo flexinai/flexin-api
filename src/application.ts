@@ -18,12 +18,13 @@ import {
   GoogleOauth2Authentication,
 } from './authentication-strategies';
 import {CustomOauth2, GoogleOauth} from './authentication-strategy-providers';
-import {PassportUserIdentityService, UserServiceBindings} from './services';
+import {JWTService, PassportUserIdentityService, UserServiceBindings} from './services';
 import passport from 'passport';
 import {
   JWTAuthenticationComponent,
   TokenServiceBindings,
 } from '@loopback/authentication-jwt';
+import {AuthorizationComponent} from '@loopback/authorization';
 // ----------------------
 
 export {ApplicationConfig};
@@ -43,6 +44,7 @@ export class FlexinApiApplication extends BootMixin(
 
     this.component(AuthenticationComponent);
     this.component(JWTAuthenticationComponent);
+    this.component(AuthorizationComponent);
     this.setUpBindings();
 
     this.bind('googleOAuth2Options').to(oAuth2Providers['google-login']);
@@ -87,6 +89,7 @@ export class FlexinApiApplication extends BootMixin(
       PassportUserIdentityService,
     );
     // JWT
+    this.bind(TokenServiceBindings.TOKEN_SERVICE).toClass(JWTService);
     this.bind(TokenServiceBindings.TOKEN_SECRET).to(
       process.env.TOKEN_SECRET || 'SuperSecureTokens3cr3t',
     );

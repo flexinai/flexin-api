@@ -5,3 +5,5 @@
 
 export * from './user.service';
 export * from './keys';
+export * from './jwt.service';
+export * from './basic.authorizer.service';
