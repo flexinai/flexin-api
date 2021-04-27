@@ -8,7 +8,7 @@ import {roleAndIdMatch} from '../services';
 
 @authenticate('jwt')
 @authorize({
-  allowedRoles: ['admin', 'user'],
+  allowedRoles: ['admin', 'athlete'],
   voters: [roleAndIdMatch],
 })
 export class UserProgramAssigneeController {
