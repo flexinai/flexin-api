@@ -1,4 +1,7 @@
+import {inject} from '@loopback/core';
 import {get} from '@loopback/rest';
+import {authenticate} from '@loopback/authentication';
+import {securityId, SecurityBindings, UserProfile} from '@loopback/security';
 const AWS = require('aws-sdk');
 
 const signedUrlExpireSeconds = 60 * 5;
@@ -12,18 +15,44 @@ const config = {
   endpoint: process.env.S3_ENDPOINT, // it could be any S3 provider
 };
 
-export class VideoController {
-  constructor() {}
+const bucket = 'flexin-video';
 
+const padWithZero = (i:number):string => {
+  return (i < 10 ? '0' : '') + i;
+}
+
+const getCurrentTimeStamp = ():string => {
+  let d = new Date();
+
+  return d.getFullYear() +
+    padWithZero(d.getMonth() + 1) +
+    padWithZero(d.getDate()) + '-' +
+    padWithZero(d.getHours()) +
+    padWithZero(d.getMinutes()) +
+    padWithZero(d.getSeconds());
+}
+
+
+export class VideoController {
+  constructor(
+    @inject(SecurityBindings.USER, {optional: true}) private user: UserProfile
+  ) {}
+
+  @authenticate('jwt')
   @get('/video/upload-url')
   uploadUrl(): Promise<string> {
-    const s3UploadParams = {
-      Bucket: 'flexin-video',
-      Key: 'lb-test.jpg',
+
+    let fileName = this.user[securityId].padStart(8,'0') + '-' + getCurrentTimeStamp();
+
+    const uploadParams = {
+      Bucket: bucket,
+      Key: fileName,
       ContentType: 'application/octet-stream',
       Expires: signedUrlExpireSeconds,
     };
+
     const s3 = new AWS.S3(config);
-    return s3.getSignedUrl('putObject', s3UploadParams);
+
+    return s3.getSignedUrl('putObject', uploadParams);
   }
 }
