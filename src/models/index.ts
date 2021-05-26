@@ -15,3 +15,4 @@ export * from './exercise-category.model';
 export * from './user-credentials.model';
 export * from './user-identity.model';
 export * from './clip.model';
+export * from './video.model';
