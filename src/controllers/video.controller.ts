@@ -32,17 +32,32 @@ const getCurrentTimeStamp = ():string => {
     padWithZero(d.getSeconds());
 }
 
-
 export class VideoController {
-  constructor(
-    @inject(SecurityBindings.USER, {optional: true}) private user: UserProfile
-  ) {}
+  constructor(@inject(SecurityBindings.USER, {optional: true}) private user: UserProfile) {}
 
   @authenticate('jwt')
-  @get('/video/upload-url')
-  uploadUrl(): Promise<string> {
-
-    let fileName = this.user[securityId].padStart(8,'0') + '-' + getCurrentTimeStamp();
+  @get('/video/upload-url', {
+    responses: {
+      '200': {
+        description: 'Object containing a pre-signed URL for upload to S3',
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              properties: {
+                url: {
+                  type: 'string',
+                  description: 'Pre-signed URL string',
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  })
+  uploadUrl(): object {
+    let fileName = this.user[securityId].padStart(8, '0') + '-' + getCurrentTimeStamp();
 
     const uploadParams = {
       Bucket: bucket,
@@ -53,6 +68,6 @@ export class VideoController {
 
     const s3 = new AWS.S3(config);
 
-    return s3.getSignedUrl('putObject', uploadParams);
+    return { url: s3.getSignedUrl('putObject', uploadParams) };
   }
 }
