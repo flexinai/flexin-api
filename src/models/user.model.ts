@@ -59,6 +59,7 @@ export class User extends Entity {
   @property({
     type: 'array',
     itemType: 'string',
+    default: '["coach","athlete"]',
   })
   roles?: string[];
 
