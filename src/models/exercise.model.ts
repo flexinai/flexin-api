@@ -2,7 +2,6 @@ import {Entity, model, property, hasMany, belongsTo} from '@loopback/repository'
 import {Category} from './category.model';
 import {ExerciseCategory} from './exercise-category.model';
 import {Intensity} from './intensity.model';
-import {DemonstrationVideo} from './demonstration-video.model';
 import {User} from './user.model';
 
 @model()
@@ -37,9 +36,6 @@ export class Exercise extends Entity {
 
   @hasMany(() => Intensity)
   intensities: Intensity[];
-
-  @hasMany(() => DemonstrationVideo)
-  demonstrationVideos: DemonstrationVideo[];
 
   @belongsTo(() => User)
   createdById: number;
