@@ -1,7 +1,6 @@
 import {Entity, model, property, hasMany, hasOne, belongsTo} from '@loopback/repository';
 import {Workout} from './workout.model';
 import {SetStatistic} from './set-statistic.model';
-import {Playlist} from './playlist.model';
 import {User} from './user.model';
 
 @model()
@@ -24,9 +23,6 @@ export class Program extends Entity {
 
   @hasMany(() => SetStatistic)
   setStatistics: SetStatistic[];
-
-  @hasOne(() => Playlist)
-  playlist: Playlist;
 
   @belongsTo(() => User)
   createdById: number;
