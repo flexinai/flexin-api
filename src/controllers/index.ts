@@ -34,3 +34,5 @@ export * from './user-intensity.controller';
 export * from './user-program-creator.controller';
 export * from './user-program-assignee.controller';
 export * from './video.controller';
+export * from './demonstration-video.controller';
+export * from './workout-video.controller';
