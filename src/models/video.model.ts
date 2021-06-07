@@ -1,19 +1,19 @@
-import {Model, model, property} from '@loopback/repository';
+import {Entity, model, property} from '@loopback/repository';
 
 @model()
-export class Video extends Model {
-  @property({
-    type: 'string',
-    required: true,
-  })
-  url: string;
-
+export class Video extends Entity {
   @property({
     type: 'number',
     id: true,
     generated: true,
   })
   id?: number;
+
+  @property({
+    type: 'string',
+    required: true,
+  })
+  url: string;
 
   @property({
     type: 'string',
