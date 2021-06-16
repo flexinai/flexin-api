@@ -1,8 +1,9 @@
-import {Entity, model, property, hasMany, belongsTo} from '@loopback/repository';
+import {Entity, model, property, hasMany, belongsTo, hasOne} from '@loopback/repository';
 import {Category} from './category.model';
 import {ExerciseCategory} from './exercise-category.model';
 import {Intensity} from './intensity.model';
 import {User} from './user.model';
+import {DemonstrationVideo} from './demonstration-video.model';
 
 @model()
 export class Exercise extends Entity {
@@ -39,6 +40,9 @@ export class Exercise extends Entity {
 
   @belongsTo(() => User)
   createdById: number;
+
+  @hasOne(() => DemonstrationVideo)
+  demonstrationVideo: DemonstrationVideo;
 
   constructor(data?: Partial<Exercise>) {
     super(data);

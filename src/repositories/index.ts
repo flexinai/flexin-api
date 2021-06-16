@@ -10,3 +10,5 @@ export * from './exercise-category.repository';
 export * from './user-credentials.repository';
 export * from './user-identity.repository';
 export * from './clip.repository';
+export * from './demonstration-video.repository';
+export * from './workout-video.repository';

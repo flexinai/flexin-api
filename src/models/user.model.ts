@@ -10,6 +10,8 @@ import {Category} from './category.model';
 import {Exercise} from './exercise.model';
 import {Intensity} from './intensity.model';
 import {Program} from './program.model';
+import {DemonstrationVideo} from './demonstration-video.model';
+import {WorkoutVideo} from './workout-video.model';
 
 @model()
 export class User extends Entity {
@@ -77,6 +79,12 @@ export class User extends Entity {
 
   @hasMany(() => Program, {keyTo: 'assignedToId'})
   programsAssigned: Program[];
+
+  @hasMany(() => DemonstrationVideo, {keyTo: 'createdById'})
+  demonstrationVideos: DemonstrationVideo[];
+
+  @hasMany(() => WorkoutVideo, {keyTo: 'createdById'})
+  workoutVideos: WorkoutVideo[];
   @hasOne(() => UserCredentials)
   credentials?: UserCredentials;
 
