@@ -1,5 +1,5 @@
 import {model, property} from '@loopback/repository';
-import {Video} from '.';
+import {Video} from './video.model';
 
 @model()
 export class DemonstrationVideo extends Video {
@@ -14,6 +14,15 @@ export class DemonstrationVideo extends Video {
   })
   notes?: string;
 
+  @property({
+    type: 'number',
+  })
+  createdById?: number;
+
+  @property({
+    type: 'number',
+  })
+  exerciseId?: number;
 
   constructor(data?: Partial<DemonstrationVideo>) {
     super(data);

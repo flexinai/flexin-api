@@ -1,8 +1,17 @@
-import {model, property} from '@loopback/repository';
-import {Video} from '.';
+import {model, property, hasMany} from '@loopback/repository';
+import {Video} from './video.model';
+import {Clip} from './clip.model';
 
 @model()
 export class WorkoutVideo extends Video {
+
+  @property({
+    type: 'number',
+  })
+  createdById?: number;
+
+  @hasMany(() => Clip)
+  clips: Clip[];
 
   constructor(data?: Partial<WorkoutVideo>) {
     super(data);

@@ -36,3 +36,8 @@ export * from './user-program-assignee.controller';
 export * from './video.controller';
 export * from './demonstration-video.controller';
 export * from './workout-video.controller';
+export * from './user-demonstration-video.controller';
+export * from './user-workout-video.controller';
+export * from './workout-video-clip.controller';
+export * from './clip-workout-video.controller';
+export * from './exercise-demonstration-video.controller';
