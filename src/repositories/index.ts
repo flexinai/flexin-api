@@ -1,14 +1,4 @@
-export * from './category.repository';
-export * from './exercise.repository';
-export * from './intensity.repository';
-export * from './program.repository';
-export * from './set-statistic.repository';
-export * from './set.repository';
-export * from './user.repository';
-export * from './workout.repository';
-export * from './exercise-category.repository';
 export * from './user-credentials.repository';
 export * from './user-identity.repository';
-export * from './clip.repository';
-export * from './demonstration-video.repository';
-export * from './workout-video.repository';
+export * from './user.repository';
+
