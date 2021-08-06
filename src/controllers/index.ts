@@ -3,3 +3,4 @@ export * from './ping.controller';
 export * from './self.controller';
 export * from './user.controller';
 
+export * from './annotation-note.controller';
