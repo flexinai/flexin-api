@@ -8,3 +8,4 @@ export * from './annotation.controller';
 export * from './clip.controller';
 export * from './video.controller';
 export * from './clip-annotation.controller';
+export * from './annotation-annotation-note.controller';

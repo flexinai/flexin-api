@@ -1,4 +1,5 @@
-import {Entity, model, property} from '@loopback/repository';
+import {Entity, model, property, belongsTo} from '@loopback/repository';
+import {AnnotationNote} from './annotation-note.model';
 
 @model()
 export class Annotation extends Entity {
@@ -19,6 +20,9 @@ export class Annotation extends Entity {
     type: 'number',
   })
   clipId?: number;
+
+  @belongsTo(() => AnnotationNote)
+  annotationNoteId: number;
 
   constructor(data?: Partial<Annotation>) {
     super(data);
