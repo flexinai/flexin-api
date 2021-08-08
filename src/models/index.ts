@@ -4,3 +4,4 @@ export * from './user.model';
 
 export * from './annotation-note.model';
 export * from './annotation.model';
+export * from './clip.model';

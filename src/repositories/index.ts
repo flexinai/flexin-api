@@ -4,3 +4,4 @@ export * from './user.repository';
 
 export * from './annotation-note.repository';
 export * from './annotation.repository';
+export * from './clip.repository';
