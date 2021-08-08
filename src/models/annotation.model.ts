@@ -15,6 +15,10 @@ export class Annotation extends Entity {
   })
   timestamp: number;
 
+  @property({
+    type: 'number',
+  })
+  clipId?: number;
 
   constructor(data?: Partial<Annotation>) {
     super(data);
