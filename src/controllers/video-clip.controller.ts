@@ -3,7 +3,7 @@ import {
   CountSchema,
   Filter,
   repository,
-  Where,
+  Where
 } from '@loopback/repository';
 import {
   del,
@@ -13,11 +13,10 @@ import {
   param,
   patch,
   post,
-  requestBody,
+  requestBody
 } from '@loopback/rest';
 import {
-  Video,
-  Clip,
+  Clip, Video
 } from '../models';
 import {VideoRepository} from '../repositories';
 
@@ -39,7 +38,7 @@ export class VideoClipController {
     },
   })
   async find(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @param.query.object('filter') filter?: Filter<Clip>,
   ): Promise<Clip[]> {
     return this.videoRepository.clips(id).find(filter);
@@ -54,7 +53,7 @@ export class VideoClipController {
     },
   })
   async create(
-    @param.path.number('id') id: typeof Video.prototype.id,
+    @param.path.string('id') id: typeof Video.prototype.id,
     @requestBody({
       content: {
         'application/json': {
@@ -79,7 +78,7 @@ export class VideoClipController {
     },
   })
   async patch(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @requestBody({
       content: {
         'application/json': {
@@ -102,7 +101,7 @@ export class VideoClipController {
     },
   })
   async delete(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @param.query.object('where', getWhereSchemaFor(Clip)) where?: Where<Clip>,
   ): Promise<Count> {
     return this.videoRepository.clips(id).delete(where);

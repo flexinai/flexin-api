@@ -4,18 +4,12 @@ import {
   Filter,
   FilterExcludingWhere,
   repository,
-  Where,
+  Where
 } from '@loopback/repository';
 import {
-  post,
-  param,
-  get,
-  getModelSchemaRef,
-  patch,
-  put,
-  del,
-  requestBody,
-  response,
+  del, get,
+  getModelSchemaRef, param, patch, post, put, requestBody,
+  response
 } from '@loopback/rest';
 import {Video} from '../models';
 import {VideoRepository} from '../repositories';
@@ -23,8 +17,8 @@ import {VideoRepository} from '../repositories';
 export class VideoController {
   constructor(
     @repository(VideoRepository)
-    public videoRepository : VideoRepository,
-  ) {}
+    public videoRepository: VideoRepository,
+  ) { }
 
   @post('/videos')
   @response(200, {
@@ -37,12 +31,12 @@ export class VideoController {
         'application/json': {
           schema: getModelSchemaRef(Video, {
             title: 'NewVideo',
-            exclude: ['id'],
+            // exclude: ['id'],
           }),
         },
       },
     })
-    video: Omit<Video, 'id'>,
+    video: Video
   ): Promise<Video> {
     return this.videoRepository.create(video);
   }
@@ -105,7 +99,7 @@ export class VideoController {
     },
   })
   async findById(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @param.filter(Video, {exclude: 'where'}) filter?: FilterExcludingWhere<Video>
   ): Promise<Video> {
     return this.videoRepository.findById(id, filter);
@@ -116,7 +110,7 @@ export class VideoController {
     description: 'Video PATCH success',
   })
   async updateById(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @requestBody({
       content: {
         'application/json': {
@@ -134,7 +128,7 @@ export class VideoController {
     description: 'Video PUT success',
   })
   async replaceById(
-    @param.path.number('id') id: number,
+    @param.path.string('id') id: string,
     @requestBody() video: Video,
   ): Promise<void> {
     await this.videoRepository.replaceById(id, video);
@@ -144,7 +138,7 @@ export class VideoController {
   @response(204, {
     description: 'Video DELETE success',
   })
-  async deleteById(@param.path.number('id') id: number): Promise<void> {
+  async deleteById(@param.path.string('id') id: string): Promise<void> {
     await this.videoRepository.deleteById(id);
   }
 }
