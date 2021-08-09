@@ -9,3 +9,4 @@ export * from './clip.controller';
 export * from './video.controller';
 export * from './clip-annotation.controller';
 export * from './annotation-annotation-note.controller';
+export * from './video-clip.controller';

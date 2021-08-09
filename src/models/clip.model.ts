@@ -25,6 +25,11 @@ export class Clip extends Entity {
   @hasMany(() => Annotation)
   annotations: Annotation[];
 
+  @property({
+    type: 'number',
+  })
+  videoId?: number;
+
   constructor(data?: Partial<Clip>) {
     super(data);
   }
