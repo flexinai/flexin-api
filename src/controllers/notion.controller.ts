@@ -1,5 +1,5 @@
 import {inject} from '@loopback/core';
-import {post, requestBody, SchemaObject, RequestBody} from '@loopback/rest';
+import {post, requestBody, Response, RestBindings, SchemaObject} from '@loopback/rest';
 import {NotionService} from '../services';
 
 /* object specification for new video */
@@ -39,12 +39,14 @@ export class NotionController {
   constructor(
     @inject('services.NotionService')
     protected notionService: NotionService,
+    @inject(RestBindings.Http.RESPONSE)
+    protected response: Response,
   ) {}
 
   @post('/notion', {
     responses: {
-      '200': {
-        description: 'Notion Page',
+      '201': {
+        description: 'Notion page created',
         content: {
           'application/json': {
             schema: {
@@ -79,6 +81,7 @@ export class NotionController {
     video: NotionVideo,
   ): Promise<any> {
     let newVideo = await this.notionService.createPage(video.url, video.email);
+    this.response.status(201);
     /* object returned from the API has the full details with all created properties;
        return just the id, created_time, & url */
     return {
