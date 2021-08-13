@@ -13,8 +13,14 @@ const NotionVideoSchema: SchemaObject = {
   type: 'object',
   required: ['url', 'email'],
   properties: {
-    url: {type: 'string'},
-    email: {type: 'string'},
+    url: {
+      type: 'string',
+      format: 'uri',
+    },
+    email: {
+      type: 'string',
+      format: 'email',
+    },
   },
 };
 
