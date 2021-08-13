@@ -2,13 +2,13 @@ import {inject} from '@loopback/core';
 import {post, requestBody, SchemaObject, RequestBody} from '@loopback/rest';
 import {NotionService} from '../services';
 
+/* object specification for new video */
 type NotionVideo = {
   url: string;
   email: string;
 };
 
-const myType: string = 'string';
-
+/* JSON schema for new video */
 const NotionVideoSchema: SchemaObject = {
   type: 'object',
   required: ['url', 'email'],
@@ -24,6 +24,7 @@ const NotionVideoSchema: SchemaObject = {
   },
 };
 
+/* request body */
 const NotionVideoRequestBody = {
   description: 'Required fields to post a video to Notion',
   required: true,
@@ -78,6 +79,8 @@ export class NotionController {
     video: NotionVideo,
   ): Promise<any> {
     let newVideo = await this.notionService.createVideo(video.url, video.email);
+    /* object returned from the API has the full details with all created properties;
+       return just the id, created_time, & url */
     return {
       id: newVideo.id,
       created_time: newVideo.created_time,
