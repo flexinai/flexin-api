@@ -36,7 +36,7 @@ const config = {
         },
       },
       functions: {
-        createVideo: ['url', 'email'],
+        createPage: ['url', 'email'],
       },
     },
   ],

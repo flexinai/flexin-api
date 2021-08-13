@@ -78,7 +78,7 @@ export class NotionController {
     @requestBody(NotionVideoRequestBody)
     video: NotionVideo,
   ): Promise<any> {
-    let newVideo = await this.notionService.createVideo(video.url, video.email);
+    let newVideo = await this.notionService.createPage(video.url, video.email);
     /* object returned from the API has the full details with all created properties;
        return just the id, created_time, & url */
     return {
