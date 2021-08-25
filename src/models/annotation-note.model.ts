@@ -15,6 +15,11 @@ export class AnnotationNote extends Entity {
   })
   note: string;
 
+  @property({
+    type: 'string',
+    required: false,
+  })
+  url: string;
 
   constructor(data?: Partial<AnnotationNote>) {
     super(data);
