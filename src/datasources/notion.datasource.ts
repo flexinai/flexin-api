@@ -2,7 +2,7 @@ import {inject, lifeCycleObserver, LifeCycleObserver} from '@loopback/core';
 import {juggler} from '@loopback/repository';
 
 const databaseId = process.env.NOTION_DATABASE_ID;
-const notionVersion = '2021-07-27';
+const notionVersion = process.env.NOTION_API_VERSION;
 
 const config = {
   name: 'notion',
