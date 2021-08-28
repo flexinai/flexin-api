@@ -24,6 +24,16 @@ export class Annotation extends Entity {
   @belongsTo(() => AnnotationNote)
   annotationNoteId: number;
 
+  @property({
+    type: 'number',
+  })
+  createdById?: number;
+
+  @property({
+    type: 'number',
+  })
+  assignedToId?: number;
+
   constructor(data?: Partial<Annotation>) {
     super(data);
   }
