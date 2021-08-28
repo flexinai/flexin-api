@@ -9,9 +9,10 @@ import {
   HasManyRepositoryFactory, HasOneRepositoryFactory, repository
 } from '@loopback/repository';
 import {DbDataSource} from '../datasources';
-import {User, UserCredentials, UserIdentity} from '../models';
+import {User, UserCredentials, UserIdentity, Annotation} from '../models';
 import {UserCredentialsRepository} from './user-credentials.repository';
 import {UserIdentityRepository} from './user-identity.repository';
+import {AnnotationRepository} from './annotation.repository';
 
 export class UserRepository extends DefaultCrudRepository<
   User,
@@ -27,14 +28,22 @@ export class UserRepository extends DefaultCrudRepository<
     typeof User.prototype.id
   >;
 
+  public readonly annotationsCreated: HasManyRepositoryFactory<Annotation, typeof User.prototype.id>;
+
+  public readonly annotationsAssigned: HasManyRepositoryFactory<Annotation, typeof User.prototype.id>;
+
   constructor(
     @inject('datasources.db') dataSource: DbDataSource,
     @repository.getter('UserIdentityRepository')
     protected profilesGetter: Getter<UserIdentityRepository>,
     @repository.getter('UserCredentialsRepository')
-    protected credentialsGetter: Getter<UserCredentialsRepository>
+    protected credentialsGetter: Getter<UserCredentialsRepository>, @repository.getter('AnnotationRepository') protected annotationRepositoryGetter: Getter<AnnotationRepository>,
   ) {
     super(User, dataSource);
+    this.annotationsAssigned = this.createHasManyRepositoryFactoryFor('annotationsAssigned', annotationRepositoryGetter,);
+    this.registerInclusionResolver('annotationsAssigned', this.annotationsAssigned.inclusionResolver);
+    this.annotationsCreated = this.createHasManyRepositoryFactoryFor('annotationsCreated', annotationRepositoryGetter,);
+    this.registerInclusionResolver('annotationsCreated', this.annotationsCreated.inclusionResolver);
     this.profiles = this.createHasManyRepositoryFactoryFor(
       'profiles',
       profilesGetter,
