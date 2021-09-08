@@ -1,6 +1,6 @@
 import {inject} from '@loopback/core';
 import {post, requestBody, Response, RestBindings, SchemaObject} from '@loopback/rest';
-import {NotionService} from '../services';
+import {MixpanelEvent, MixpanelService, NotionService} from '../services';
 
 /* object specification for new video */
 type NotionVideo = {
@@ -39,6 +39,8 @@ export class NotionController {
   constructor(
     @inject('services.NotionService')
     protected notionService: NotionService,
+    @inject('services.MixpanelService')
+    protected mixpanelService: MixpanelService,
     @inject(RestBindings.Http.RESPONSE)
     protected response: Response,
   ) {}
@@ -82,6 +84,14 @@ export class NotionController {
   ): Promise<any> {
     let newVideo = await this.notionService.createPage(video.url, video.email);
     this.response.status(201);
+
+    // log a mixpanel event
+    this.mixpanelService.trackEvent({
+      name: 'video submitted',
+      distinctId: video.email,
+      additionalProperties: {videoId: video.url},
+    });
+
     /* object returned from the API has the full details with all created properties;
        return just the id, created_time, & url */
     return {

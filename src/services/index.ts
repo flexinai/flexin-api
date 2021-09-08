@@ -8,3 +8,4 @@ export * from './keys';
 export * from './jwt.service';
 export * from './basic.authorizer.service';
 export * from './notion-service.service';
+export * from './mixpanel.service';
