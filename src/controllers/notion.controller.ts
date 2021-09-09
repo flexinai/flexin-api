@@ -45,7 +45,7 @@ export class NotionController {
     protected response: Response,
   ) {}
 
-  @post('/notion', {
+  @post('/notion/new', {
     responses: {
       '201': {
         description: 'Notion page created',
