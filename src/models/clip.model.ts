@@ -36,6 +36,7 @@ export class Clip extends Entity {
 
 export interface ClipRelations {
   // describe navigational properties here
+  video: Video;
 }
 
 export type ClipWithRelations = Clip & ClipRelations;

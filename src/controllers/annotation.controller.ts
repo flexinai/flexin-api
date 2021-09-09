@@ -18,12 +18,18 @@ import {
   response,
 } from '@loopback/rest';
 import {Annotation} from '../models';
-import {AnnotationRepository} from '../repositories';
+import {AnnotationRepository, ClipRepository} from '../repositories';
+import {inject} from '@loopback/core';
+import {MixpanelEvent, MixpanelService} from '../services';
 
 export class AnnotationController {
   constructor(
     @repository(AnnotationRepository)
-    public annotationRepository : AnnotationRepository,
+    public annotationRepository: AnnotationRepository,
+    @repository(ClipRepository)
+    protected clipRepository: ClipRepository,
+    @inject('services.MixpanelService')
+    protected mixpanelService: MixpanelService,
   ) {}
 
   @post('/annotations')
@@ -44,6 +50,15 @@ export class AnnotationController {
     })
     annotation: Omit<Annotation, 'id'>,
   ): Promise<Annotation> {
+    const clip = await this.clipRepository.findById(annotation.clipId, {
+      include: [{relation: 'video'}],
+    });
+    // log a mixpanel event
+    this.mixpanelService.trackEvent({
+      name: 'video annotated',
+      distinctId: clip.video.email || 'unknown',
+      additionalProperties: {videoId: clip.videoId},
+    });
     return this.annotationRepository.create(annotation);
   }
 
@@ -52,9 +67,7 @@ export class AnnotationController {
     description: 'Annotation model count',
     content: {'application/json': {schema: CountSchema}},
   })
-  async count(
-    @param.where(Annotation) where?: Where<Annotation>,
-  ): Promise<Count> {
+  async count(@param.where(Annotation) where?: Where<Annotation>): Promise<Count> {
     return this.annotationRepository.count(where);
   }
 
@@ -70,9 +83,7 @@ export class AnnotationController {
       },
     },
   })
-  async find(
-    @param.filter(Annotation) filter?: Filter<Annotation>,
-  ): Promise<Annotation[]> {
+  async find(@param.filter(Annotation) filter?: Filter<Annotation>): Promise<Annotation[]> {
     return this.annotationRepository.find(filter);
   }
 
@@ -106,7 +117,7 @@ export class AnnotationController {
   })
   async findById(
     @param.path.number('id') id: number,
-    @param.filter(Annotation, {exclude: 'where'}) filter?: FilterExcludingWhere<Annotation>
+    @param.filter(Annotation, {exclude: 'where'}) filter?: FilterExcludingWhere<Annotation>,
   ): Promise<Annotation> {
     return this.annotationRepository.findById(id, filter);
   }
@@ -133,10 +144,7 @@ export class AnnotationController {
   @response(204, {
     description: 'Annotation PUT success',
   })
-  async replaceById(
-    @param.path.number('id') id: number,
-    @requestBody() annotation: Annotation,
-  ): Promise<void> {
+  async replaceById(@param.path.number('id') id: number, @requestBody() annotation: Annotation): Promise<void> {
     await this.annotationRepository.replaceById(id, annotation);
   }
 

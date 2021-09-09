@@ -20,11 +20,15 @@ import {
   Annotation,
 } from '../models';
 import {ClipRepository} from '../repositories';
+import {inject} from '@loopback/core';
+import {MixpanelEvent, MixpanelService} from '../services';
 
 export class ClipAnnotationController {
   constructor(
     @repository(ClipRepository) protected clipRepository: ClipRepository,
-  ) { }
+    @inject('services.MixpanelService')
+    protected mixpanelService: MixpanelService,
+  ) {}
 
   @get('/clips/{id}/annotations', {
     responses: {
@@ -61,12 +65,20 @@ export class ClipAnnotationController {
           schema: getModelSchemaRef(Annotation, {
             title: 'NewAnnotationInClip',
             exclude: ['id'],
-            optional: ['clipId']
+            optional: ['clipId'],
           }),
         },
       },
-    }) annotation: Omit<Annotation, 'id'>,
+    })
+    annotation: Omit<Annotation, 'id'>,
   ): Promise<Annotation> {
+    const clip = await this.clipRepository.findById(id, {include: [{relation: 'video'}]});
+    // log a mixpanel event
+    this.mixpanelService.trackEvent({
+      name: 'video annotated',
+      distinctId: clip.video.email || 'unknown',
+      additionalProperties: {videoId: clip.videoId},
+    });
     return this.clipRepository.annotations(id).create(annotation);
   }
 
