@@ -18,12 +18,18 @@ import {
   response,
 } from '@loopback/rest';
 import {Clip} from '../models';
-import {ClipRepository} from '../repositories';
+import {ClipRepository, VideoRepository} from '../repositories';
+import {inject} from '@loopback/core';
+import {MixpanelEvent, MixpanelService} from '../services';
 
 export class ClipController {
   constructor(
     @repository(ClipRepository)
-    public clipRepository : ClipRepository,
+    public clipRepository: ClipRepository,
+    @repository(VideoRepository)
+    protected videoRepository: VideoRepository,
+    @inject('services.MixpanelService')
+    protected mixpanelService: MixpanelService,
   ) {}
 
   @post('/clips')
@@ -44,6 +50,15 @@ export class ClipController {
     })
     clip: Omit<Clip, 'id'>,
   ): Promise<Clip> {
+    const video = await this.videoRepository.findById(clip.videoId);
+    // log a mixpanel event
+    this.mixpanelService.trackEvent({
+      name: 'video clipped',
+      distinctId: video.email!,
+      additionalProperties: {
+        videoId: video.id,
+      },
+    });
     return this.clipRepository.create(clip);
   }
 
@@ -52,9 +67,7 @@ export class ClipController {
     description: 'Clip model count',
     content: {'application/json': {schema: CountSchema}},
   })
-  async count(
-    @param.where(Clip) where?: Where<Clip>,
-  ): Promise<Count> {
+  async count(@param.where(Clip) where?: Where<Clip>): Promise<Count> {
     return this.clipRepository.count(where);
   }
 
@@ -70,9 +83,7 @@ export class ClipController {
       },
     },
   })
-  async find(
-    @param.filter(Clip) filter?: Filter<Clip>,
-  ): Promise<Clip[]> {
+  async find(@param.filter(Clip) filter?: Filter<Clip>): Promise<Clip[]> {
     return this.clipRepository.find(filter);
   }
 
@@ -106,7 +117,7 @@ export class ClipController {
   })
   async findById(
     @param.path.number('id') id: number,
-    @param.filter(Clip, {exclude: 'where'}) filter?: FilterExcludingWhere<Clip>
+    @param.filter(Clip, {exclude: 'where'}) filter?: FilterExcludingWhere<Clip>,
   ): Promise<Clip> {
     return this.clipRepository.findById(id, filter);
   }
@@ -133,10 +144,7 @@ export class ClipController {
   @response(204, {
     description: 'Clip PUT success',
   })
-  async replaceById(
-    @param.path.number('id') id: number,
-    @requestBody() clip: Clip,
-  ): Promise<void> {
+  async replaceById(@param.path.number('id') id: number, @requestBody() clip: Clip): Promise<void> {
     await this.clipRepository.replaceById(id, clip);
   }
 
