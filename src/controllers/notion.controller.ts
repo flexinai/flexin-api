@@ -85,11 +85,14 @@ export class NotionController {
     let newVideo = await this.notionService.createPage(video.url, video.email);
     this.response.status(201);
 
+    // parse the videoID - everything after the last '/'
+    let matches = video.url.match(/(?<=\/)[^/]*$/);
+    let videoId = matches ? matches[0] : 'unknown';
     // log a mixpanel event
     this.mixpanelService.trackEvent({
       name: 'video submitted',
       distinctId: video.email,
-      additionalProperties: {videoId: video.url},
+      additionalProperties: {videoId: videoId},
     });
 
     /* object returned from the API has the full details with all created properties;
