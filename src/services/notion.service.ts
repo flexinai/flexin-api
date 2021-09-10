@@ -5,7 +5,8 @@ import {NotionDataSource} from '../datasources';
 export interface NotionService {
   // Node.js methods that will be mapped to REST/SOAP/gRPC operations as
   // stated in the datasource json file.
-  createPage(url: string, email: string): Promise<any>;
+  addVideoNew(url: string, email: string): Promise<any>;
+  addVideoReviewed(videoId: string, email: string): Promise<any>;
 }
 
 export class NotionServiceProvider implements Provider<NotionService> {

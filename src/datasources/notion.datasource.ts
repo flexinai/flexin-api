@@ -1,7 +1,8 @@
 import {inject, lifeCycleObserver, LifeCycleObserver} from '@loopback/core';
 import {juggler} from '@loopback/repository';
 
-const databaseId = process.env.NOTION_DATABASE_ID;
+const databaseIdNew = process.env.NOTION_DATABASE_ID_NEW;
+const databaseIdReviewed = process.env.NOTION_DATABASE_ID_REVIEWED;
 const notionVersion = process.env.NOTION_API_VERSION;
 
 const config = {
@@ -22,7 +23,7 @@ const config = {
         method: 'POST',
         url: 'https://api.notion.com/v1/pages',
         body: {
-          parent: {database_id: databaseId},
+          parent: {database_id: databaseIdNew},
           properties: {
             'YouTube URL': {
               type: 'url',
@@ -36,7 +37,29 @@ const config = {
         },
       },
       functions: {
-        createPage: ['url', 'email'],
+        addVideoNew: ['url', 'email'],
+      },
+    },
+    {
+      template: {
+        method: 'POST',
+        url: 'https://api.notion.com/v1/pages',
+        body: {
+          parent: {database_id: databaseIdReviewed},
+          properties: {
+            videoId: {
+              type: 'rich_text',
+              rich_text: [{type: 'text', text: {content: '{videoId}'}}],
+            },
+            email: {
+              type: 'email',
+              email: '{email}',
+            },
+          },
+        },
+      },
+      functions: {
+        addVideoReviewed: ['videoId', 'email'],
       },
     },
   ],
