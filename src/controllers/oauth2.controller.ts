@@ -68,10 +68,10 @@ export class Oauth2Controller {
     @inject(RestBindings.Http.REQUEST) request: RequestWithSession,
     @inject(RestBindings.Http.RESPONSE) response: Response,
   ) {
-    console.log('Generating token for user: ', user);
+    // console.log('Generating token for user: ', user);
     const jwt = await this.jwtService.generateToken(user);
     console.log('jwt token: ', jwt);
-    response.redirect(`https://app.flexin.io/auth/account/${jwt}`);
+    response.redirect(`https://coach.flexin.io/auth/account/${jwt}`);
     return response;
   }
 }

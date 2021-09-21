@@ -21,6 +21,11 @@ export class Annotation extends Entity {
   })
   clipId?: number;
 
+  @property({
+    type: 'string',
+  })
+  comment?: string;
+
   @belongsTo(() => AnnotationNote)
   annotationNoteId: number;
 
