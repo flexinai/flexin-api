@@ -9,10 +9,11 @@ import {
   HasManyRepositoryFactory, HasOneRepositoryFactory, repository
 } from '@loopback/repository';
 import {DbDataSource} from '../datasources';
-import {User, UserCredentials, UserIdentity, Annotation} from '../models';
+import {User, UserCredentials, UserIdentity, Annotation, Video} from '../models';
 import {UserCredentialsRepository} from './user-credentials.repository';
 import {UserIdentityRepository} from './user-identity.repository';
 import {AnnotationRepository} from './annotation.repository';
+import {VideoRepository} from './video.repository';
 
 export class UserRepository extends DefaultCrudRepository<
   User,
@@ -32,14 +33,18 @@ export class UserRepository extends DefaultCrudRepository<
 
   public readonly annotationsAssigned: HasManyRepositoryFactory<Annotation, typeof User.prototype.id>;
 
+  public readonly videosReviewed: HasManyRepositoryFactory<Video, typeof User.prototype.id>;
+
   constructor(
     @inject('datasources.db') dataSource: DbDataSource,
     @repository.getter('UserIdentityRepository')
     protected profilesGetter: Getter<UserIdentityRepository>,
     @repository.getter('UserCredentialsRepository')
-    protected credentialsGetter: Getter<UserCredentialsRepository>, @repository.getter('AnnotationRepository') protected annotationRepositoryGetter: Getter<AnnotationRepository>,
+    protected credentialsGetter: Getter<UserCredentialsRepository>, @repository.getter('AnnotationRepository') protected annotationRepositoryGetter: Getter<AnnotationRepository>, @repository.getter('VideoRepository') protected videoRepositoryGetter: Getter<VideoRepository>,
   ) {
     super(User, dataSource);
+    this.videosReviewed = this.createHasManyRepositoryFactoryFor('videosReviewed', videoRepositoryGetter,);
+    this.registerInclusionResolver('videosReviewed', this.videosReviewed.inclusionResolver);
     this.annotationsAssigned = this.createHasManyRepositoryFactoryFor('annotationsAssigned', annotationRepositoryGetter,);
     this.registerInclusionResolver('annotationsAssigned', this.annotationsAssigned.inclusionResolver);
     this.annotationsCreated = this.createHasManyRepositoryFactoryFor('annotationsCreated', annotationRepositoryGetter,);

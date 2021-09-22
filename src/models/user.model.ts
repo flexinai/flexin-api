@@ -7,6 +7,7 @@ import {Entity, hasMany, hasOne, model, property} from '@loopback/repository';
 import {UserCredentials} from './user-credentials.model';
 import {UserIdentity} from './user-identity.model';
 import {Annotation} from './annotation.model';
+import {Video} from './video.model';
 
 @model()
 export class User extends Entity {
@@ -65,6 +66,10 @@ export class User extends Entity {
 
   @hasMany(() => Annotation, {keyTo: 'assignedToId'})
   annotationsAssigned: Annotation[];
+
+  @hasMany(() => Video, {keyTo: 'reviewedById'})
+  videosReviewed: Video[];
+
   @hasOne(() => UserCredentials)
   credentials?: UserCredentials;
 
