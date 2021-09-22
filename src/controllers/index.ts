@@ -14,3 +14,4 @@ export * from './clip-video.controller';
 export * from './notion.controller';
 export * from './user-annotation-assigned.controller';
 export * from './user-annotation-created.controller';
+export * from './video-user.controller';
