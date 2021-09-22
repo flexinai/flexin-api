@@ -1,5 +1,6 @@
-import {Entity, hasMany, model, property} from '@loopback/repository';
+import {Entity, hasMany, model, property, belongsTo} from '@loopback/repository';
 import {Clip} from './clip.model';
+import {User} from './user.model';
 
 @model()
 export class Video extends Entity {
@@ -24,6 +25,9 @@ export class Video extends Entity {
 
   @hasMany(() => Clip)
   clips: Clip[];
+
+  @belongsTo(() => User)
+  reviewedById: number;
 
   constructor(data?: Partial<Video>) {
     super(data);
