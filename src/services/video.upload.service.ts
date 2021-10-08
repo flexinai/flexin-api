@@ -13,30 +13,11 @@ const config = {
   endpoint: process.env.S3_ENDPOINT, // it could be any S3 provider
 };
 
-// pad with zero up to 2 digits
-const padWithZero = (i: number): string => {
-  return (i < 10 ? '0' : '') + i;
-};
-
-// timestamp for S3 filenames
-const getCurrentTimeStamp = (): string => {
-  let d = new Date();
-  return (
-    d.getFullYear() +
-    padWithZero(d.getMonth() + 1) +
-    padWithZero(d.getDate()) +
-    '-' +
-    padWithZero(d.getHours()) +
-    padWithZero(d.getMinutes()) +
-    padWithZero(d.getSeconds())
-  );
-};
-
 @injectable({scope: BindingScope.TRANSIENT})
-export class S3Service {
-  s3;
+export class VideoUploadService {
+  s3: any;
 
-  constructor(/* Add @inject to inject parameters */) {
+  constructor() {
     this.s3 = new AWS.S3(config);
   }
 
@@ -47,6 +28,8 @@ export class S3Service {
       ContentType: 'application/octet-stream',
       Expires: signedUrlExpireSeconds,
     };
-    return {url: this.s3.getSignedUrl('pubObject', uploadParams)};
+
+    let url = this.s3.getSignedUrl('putObject', uploadParams);
+    return url;
   }
 }

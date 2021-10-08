@@ -11,14 +11,24 @@ import {
   getModelSchemaRef, param, patch, post, put, requestBody,
   response
 } from '@loopback/rest';
+import {inject} from '@loopback/core';
 import {Video} from '../models';
 import {VideoRepository} from '../repositories';
+import {VideoUploadService} from '../services';
+
+// generates a filename like '20211008T194252702Z.mp4'
+const generateFileName = () => {
+  let d = new Date();
+  return d.toISOString().replace(/[:.-]/g, '') + '.mp4';
+};
 
 export class VideoController {
   constructor(
     @repository(VideoRepository)
     public videoRepository: VideoRepository,
-  ) { }
+    @inject('services.VideoUploadService')
+    protected videoUploadService: VideoUploadService,
+  ) {}
 
   @post('/videos')
   @response(200, {
@@ -36,7 +46,7 @@ export class VideoController {
         },
       },
     })
-    video: Video
+    video: Video,
   ): Promise<Video> {
     return this.videoRepository.create(video);
   }
@@ -46,9 +56,7 @@ export class VideoController {
     description: 'Video model count',
     content: {'application/json': {schema: CountSchema}},
   })
-  async count(
-    @param.where(Video) where?: Where<Video>,
-  ): Promise<Count> {
+  async count(@param.where(Video) where?: Where<Video>): Promise<Count> {
     return this.videoRepository.count(where);
   }
 
@@ -64,9 +72,7 @@ export class VideoController {
       },
     },
   })
-  async find(
-    @param.filter(Video) filter?: Filter<Video>,
-  ): Promise<Video[]> {
+  async find(@param.filter(Video) filter?: Filter<Video>): Promise<Video[]> {
     return this.videoRepository.find(filter);
   }
 
@@ -100,7 +106,7 @@ export class VideoController {
   })
   async findById(
     @param.path.string('id') id: string,
-    @param.filter(Video, {exclude: 'where'}) filter?: FilterExcludingWhere<Video>
+    @param.filter(Video, {exclude: 'where'}) filter?: FilterExcludingWhere<Video>,
   ): Promise<Video> {
     return this.videoRepository.findById(id, filter);
   }
@@ -127,10 +133,7 @@ export class VideoController {
   @response(204, {
     description: 'Video PUT success',
   })
-  async replaceById(
-    @param.path.string('id') id: string,
-    @requestBody() video: Video,
-  ): Promise<void> {
+  async replaceById(@param.path.string('id') id: string, @requestBody() video: Video): Promise<void> {
     await this.videoRepository.replaceById(id, video);
   }
 
@@ -140,5 +143,31 @@ export class VideoController {
   })
   async deleteById(@param.path.string('id') id: string): Promise<void> {
     await this.videoRepository.deleteById(id);
+  }
+
+  // @authenticate('jwt')
+  @get('/video/upload-url', {
+    responses: {
+      '200': {
+        description: 'Object containing a pre-signed URL for upload to S3',
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              properties: {
+                url: {
+                  type: 'string',
+                  description: 'Pre-signed URL string',
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  })
+  uploadUrl(): object {
+    let url = this.videoUploadService.getUploadUrl(generateFileName());
+    return {url: url};
   }
 }
