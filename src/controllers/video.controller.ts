@@ -146,7 +146,7 @@ export class VideoController {
   }
 
   // @authenticate('jwt')
-  @get('/video/upload-url', {
+  @get('/videos/upload-url', {
     responses: {
       '200': {
         description: 'Object containing a pre-signed URL for upload to S3',
