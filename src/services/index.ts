@@ -9,3 +9,4 @@ export * from './jwt.service';
 export * from './basic.authorizer.service';
 export * from './notion.service';
 export * from './mixpanel.service';
+export * from './s3.service';
