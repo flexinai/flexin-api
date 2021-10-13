@@ -15,13 +15,13 @@ export class Clip extends Entity {
     type: 'number',
     required: true,
   })
-  startSeconds: number;
+  startMilliseconds: number;
 
   @property({
     type: 'number',
     required: true,
   })
-  endSeconds: number;
+  endMilliseconds: number;
 
   @hasMany(() => Annotation)
   annotations: Annotation[];

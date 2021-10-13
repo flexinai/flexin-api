@@ -23,6 +23,13 @@ export class Video extends Entity {
   })
   email?: string;
 
+  // 'pending', 'valid', and 'invalid'. default to 'pending'
+  @property({
+    type: 'string',
+    default: 'pending',
+  })
+  status?: string;
+
   @hasMany(() => Clip)
   clips: Clip[];
 
