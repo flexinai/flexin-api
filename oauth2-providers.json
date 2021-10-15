@@ -3,7 +3,7 @@
         "provider": "google",
         "module": "passport-google-oauth2",
         "strategy": "OAuth2Strategy",
-        "callbackURL": "/auth/thirdparty/google/callback",
+        "callbackURL": "https://flexin-api.herokuapp.com/auth/thirdparty/google/callback",
         "authPath": "/auth/thirdparty/google",
         "callbackPath": "/auth/thirdparty/google/callback",
         "successRedirect": "/auth/account",
