@@ -27,7 +27,7 @@ export class Clip extends Entity {
   annotations: Annotation[];
 
   @belongsTo(() => Video)
-  videoId: string;
+  videoId: number;
 
   constructor(data?: Partial<Clip>) {
     super(data);

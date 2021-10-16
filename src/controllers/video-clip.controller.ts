@@ -42,7 +42,7 @@ export class VideoClipController {
     },
   })
   async find(
-    @param.path.string('id') id: string,
+    @param.path.number('id') id: number,
     @param.query.object('filter') filter?: Filter<Clip>,
   ): Promise<Clip[]> {
     return this.videoRepository.clips(id).find(filter);
@@ -92,7 +92,7 @@ export class VideoClipController {
     },
   })
   async patch(
-    @param.path.string('id') id: string,
+    @param.path.number('id') id: number,
     @requestBody({
       content: {
         'application/json': {
@@ -115,7 +115,7 @@ export class VideoClipController {
     },
   })
   async delete(
-    @param.path.string('id') id: string,
+    @param.path.number('id') id: number,
     @param.query.object('where', getWhereSchemaFor(Clip)) where?: Where<Clip>,
   ): Promise<Count> {
     return this.videoRepository.clips(id).delete(where);
