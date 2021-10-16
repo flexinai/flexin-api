@@ -5,12 +5,11 @@ import {User} from './user.model';
 @model()
 export class Video extends Entity {
   @property({
-    type: 'string',
+    type: 'number',
     id: true,
-    required: true,
-    generated: false,
+    generated: true,
   })
-  id: string;
+  id?: number;
 
   @property({
     type: 'string',
