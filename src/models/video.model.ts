@@ -19,8 +19,9 @@ export class Video extends Entity {
 
   @property({
     type: 'string',
+    required: true,
   })
-  email?: string;
+  email: string;
 
   // 'pending', 'valid', and 'invalid'. default to 'pending'
   @property({

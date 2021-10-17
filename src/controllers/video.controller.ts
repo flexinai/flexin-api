@@ -15,6 +15,7 @@ import {inject} from '@loopback/core';
 import {Video} from '../models';
 import {VideoRepository} from '../repositories';
 import {VideoUploadService} from '../services';
+import {EmailService} from '../services';
 
 // generates a filename like '20211008T194252702Z.mp4'
 const generateFileName = () => {
@@ -28,6 +29,8 @@ export class VideoController {
     public videoRepository: VideoRepository,
     @inject('services.VideoUploadService')
     protected videoUploadService: VideoUploadService,
+    @inject('services.EmailService')
+    protected emailService: EmailService,
   ) {}
 
   @post('/videos')
@@ -48,6 +51,12 @@ export class VideoController {
     })
     video: Video,
   ): Promise<Video> {
+    const emailBody = {
+      subject: 'Video Submission Received',
+      text: `Your video has been received and is being processed: ${video.url}`,
+      to: [{email: video.email, type: 'to'}],
+    };
+    this.emailService.send(emailBody);
     return this.videoRepository.create(video);
   }
 
