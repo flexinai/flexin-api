@@ -10,3 +10,4 @@ export * from './basic.authorizer.service';
 export * from './notion.service';
 export * from './mixpanel.service';
 export * from './video.upload.service';
+export * from './email.service';
