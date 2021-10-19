@@ -30,6 +30,18 @@ export class Video extends Entity {
   })
   status?: string;
 
+  @property({
+    type: 'date',
+    required: false,
+  })
+  processingEmailSent: Date;
+
+  @property({
+    type: 'date',
+    required: false,
+  })
+  reviewedEmailSent: Date;
+
   @hasMany(() => Clip)
   clips: Clip[];
 
