@@ -51,12 +51,13 @@ export class VideoController {
     })
     video: Video,
   ): Promise<Video> {
-    const emailBody = {
-      subject: 'Video Submission Received',
-      text: `Your video has been received and is being processed: ${video.url}`,
-      to: [{email: video.email, type: 'to'}],
-    };
-    this.emailService.send(emailBody);
+    const toList = [{email: video.email, type: 'to'}];
+    const emailResponse = await this.emailService.sendTemplate('video-submission-received', toList);
+    if (emailResponse[0] && emailResponse[0].status == 'sent') {
+      video.processingEmailSent = new Date();
+    } else {
+      console.log(emailResponse);
+    }
     return this.videoRepository.create(video);
   }
 

@@ -33,15 +33,14 @@ export class Video extends Entity {
   @property({
     type: 'date',
     required: false,
-    defaultFn: 'now',
   })
-  processingEmailSent: string;
+  processingEmailSent: Date;
 
   @property({
     type: 'date',
     required: false,
   })
-  reviewedEmailSent: string;
+  reviewedEmailSent: Date;
 
   @hasMany(() => Clip)
   clips: Clip[];

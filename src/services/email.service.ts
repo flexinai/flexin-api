@@ -1,6 +1,6 @@
 import {injectable, /* inject, */ BindingScope} from '@loopback/core';
 const mailchimp = require('@mailchimp/mailchimp_transactional')(process.env.MAILCHIMP_API_KEY);
-const FROM_EMAIL = 'info@flexin.io';
+const FROM_EMAIL = 'general@flexin.io';
 
 interface ToObject {
   email: string;
@@ -25,6 +25,16 @@ export class EmailService {
     };
     const response = await mailchimp.messages.send(body);
     // console.log(response);
+    return response;
+  }
+
+  async sendTemplate(templateName: string, toList: ToObject[]) {
+    const body = {
+      template_name: templateName,
+      template_content: [],
+      message: {to: toList},
+    };
+    const response = await mailchimp.messages.sendTemplate(body);
     return response;
   }
 }
