@@ -8,7 +8,8 @@ interface ToObject {
 }
 export interface EmailMessage {
   subject: string;
-  text: string;
+  text?: string;
+  html?: string;
   to: ToObject[];
 }
 
