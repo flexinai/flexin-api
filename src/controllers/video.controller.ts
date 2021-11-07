@@ -137,7 +137,15 @@ export class VideoController {
     video: Video,
   ): Promise<void> {
     const currentVideo = await this.videoRepository.findById(id);
-    console.log(`status changing from ${currentVideo.status} to ${video.status}`);
+    // if video status is changing to 'reviewed', send the "video reviewed" email
+    if (currentVideo.status == 'pending' && video.status == 'reviewed') {
+      const emailResponse = await this.sendVideoReviewedEmail(id, currentVideo.email);
+      if (emailResponse[0] && emailResponse[0].status == 'sent') {
+        video.reviewedEmailSent = new Date();
+      } else {
+        console.log(emailResponse);
+      }
+    }
     await this.videoRepository.updateById(id, video);
   }
 
@@ -148,17 +156,7 @@ export class VideoController {
   async replaceById(@param.path.number('id') id: number, @requestBody() video: Video): Promise<void> {
     const currentVideo = await this.videoRepository.findById(id);
     if (currentVideo.status == 'pending' && video.status == 'reviewed') {
-      const email: EmailMessage = {
-        subject: 'flexin Video Reviewed',
-        html:
-          `Your video has been reviewed. <a href='https://app.flexin.io/video/${id}'>Find out what your coach said</a>!<br /><br />` +
-          `Thanks so much for using our handstand app. ` +
-          `Please let us know if you have any feedback: ` +
-          `<a href='mailto:general@flexin.io'>general@flexin.io</a>.<br /><br />` +
-          `-flexin crew`,
-        to: [{email: video.email, type: 'to'}],
-      };
-      const emailResponse = await this.emailService.send(email);
+      const emailResponse = await this.sendVideoReviewedEmail(id, video.email);
       if (emailResponse[0] && emailResponse[0].status == 'sent') {
         video.reviewedEmailSent = new Date();
       } else {
@@ -201,4 +199,20 @@ export class VideoController {
     let url = this.videoUploadService.getUploadUrl(generateFileName());
     return {url: url};
   }
+
+  private sendVideoReviewedEmail(videoId: number, emailAddress: string): Promise<any> {
+    const email: EmailMessage = {
+      subject: 'flexin Video Reviewed',
+      html:
+        `Your video has been reviewed. ` +
+        `<a href="http://app.flexin.io/review/${videoId}">Find out what your coach said</a>!<br /><br />` +
+        `Thanks so much for using our handstand app. ` +
+        `Please let us know if you have any feedback: ` +
+        `<a href='mailto:general@flexin.io'>general@flexin.io</a>.<br /><br />` +
+        `-flexin crew`,
+      to: [{email: emailAddress, type: 'to'}],
+    };
+    return this.emailService.send(email);
+  }
+
 }
