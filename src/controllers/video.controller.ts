@@ -16,6 +16,7 @@ import {Video} from '../models';
 import {VideoRepository} from '../repositories';
 import {EmailMessage, VideoUploadService} from '../services';
 import {EmailService} from '../services';
+import {processingTemplate, reviewedTemplate} from '../templates';
 
 // generates a filename like '20211008T194252702Z.mp4'
 const generateFileName = () => {
@@ -51,8 +52,7 @@ export class VideoController {
     })
     video: Video,
   ): Promise<Video> {
-    const toList = [{email: video.email, type: 'to'}];
-    const emailResponse = await this.emailService.sendTemplate('video-submission-received', toList);
+    const emailResponse = await this.sendProcessingEmail(video.email);
     if (emailResponse[0] && emailResponse[0].status == 'sent') {
       video.processingEmailSent = new Date();
     } else {
@@ -137,9 +137,9 @@ export class VideoController {
     video: Video,
   ): Promise<void> {
     const currentVideo = await this.videoRepository.findById(id);
-    // if video status is changing to 'reviewed', send the "video reviewed" email
+    // if video status is changing from 'pending' to 'reviewed', send the 'video reviewed' email
     if (currentVideo.status == 'pending' && video.status == 'reviewed') {
-      const emailResponse = await this.sendVideoReviewedEmail(id, currentVideo.email);
+      const emailResponse = await this.sendVideoReviewedEmail(currentVideo.email, id);
       if (emailResponse[0] && emailResponse[0].status == 'sent') {
         video.reviewedEmailSent = new Date();
       } else {
@@ -155,8 +155,9 @@ export class VideoController {
   })
   async replaceById(@param.path.number('id') id: number, @requestBody() video: Video): Promise<void> {
     const currentVideo = await this.videoRepository.findById(id);
+    // if video status is changing from pending to reviewed, send the "video reviewed" email
     if (currentVideo.status == 'pending' && video.status == 'reviewed') {
-      const emailResponse = await this.sendVideoReviewedEmail(id, video.email);
+      const emailResponse = await this.sendVideoReviewedEmail(video.email, id);
       if (emailResponse[0] && emailResponse[0].status == 'sent') {
         video.reviewedEmailSent = new Date();
       } else {
@@ -200,19 +201,21 @@ export class VideoController {
     return {url: url};
   }
 
-  private sendVideoReviewedEmail(videoId: number, emailAddress: string): Promise<any> {
+  private sendProcessingEmail(emailAddress: string): Promise<any> {
     const email: EmailMessage = {
-      subject: 'flexin Video Reviewed',
-      html:
-        `Your video has been reviewed. ` +
-        `<a href="http://app.flexin.io/review/${videoId}">Find out what your coach said</a>!<br /><br />` +
-        `Thanks so much for using our handstand app. ` +
-        `Please let us know if you have any feedback: ` +
-        `<a href='mailto:general@flexin.io'>general@flexin.io</a>.<br /><br />` +
-        `-flexin crew`,
+      subject: 'flexin Video Submission Received',
+      html: processingTemplate(),
       to: [{email: emailAddress, type: 'to'}],
     };
     return this.emailService.send(email);
   }
 
+  private sendVideoReviewedEmail(emailAddress: string, videoId: number): Promise<any> {
+    const email: EmailMessage = {
+      subject: 'flexin Video Reviewed',
+      html: reviewedTemplate(videoId),
+      to: [{email: emailAddress, type: 'to'}],
+    };
+    return this.emailService.send(email);
+  }
 }
