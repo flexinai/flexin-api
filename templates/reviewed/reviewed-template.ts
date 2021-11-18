@@ -1,4 +1,4 @@
-export const reviewedTemplate = video => {
+export const reviewedTemplate = videoId => {
   return `
   <!doctype html>
   <html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
@@ -183,7 +183,7 @@ export const reviewedTemplate = video => {
                     <tbody>
                       <tr>
                         <td align="center" style="font-size:0px;padding:0px 25px 0px 25px;word-break:break-word;">
-                          <div style="font-family:Arial, sans-serif;font-size:16px;line-height:28px;text-align:center;color:#ffffff;"><a href="flexin.io/review/${video.id}" style="color: white">find out what your coach said</a></div>
+                          <div style="font-family:Arial, sans-serif;font-size:16px;line-height:28px;text-align:center;color:#ffffff;"><a href="https://www.flexin.io/review/${videoId}" style="color: white">find out what your coach said</a></div>
                         </td>
                       </tr>
                     </tbody>
