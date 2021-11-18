@@ -19,6 +19,12 @@ export class Video extends Entity {
 
   @property({
     type: 'string',
+    required: false,
+  })
+  analysisUrl?: string;
+
+  @property({
+    type: 'string',
     required: true,
   })
   email: string;
