@@ -1,3 +1,4 @@
+import {inject} from '@loopback/core';
 import {
   Count,
   CountSchema,
@@ -11,16 +12,14 @@ import {
   getModelSchemaRef, param, patch, post, put, requestBody,
   response
 } from '@loopback/rest';
-import {inject} from '@loopback/core';
 import {Video} from '../models';
 import {VideoRepository} from '../repositories';
-import {EmailMessage, VideoUploadService} from '../services';
-import {EmailService} from '../services';
+import {EmailMessage, EmailService, VideoUploadService} from '../services';
 import {processingTemplate, reviewedTemplate} from '../templates';
 
 // generates a filename like '20211008T194252702Z.mp4'
 const generateFileName = () => {
-  let d = new Date();
+  const d = new Date();
   return d.toISOString().replace(/[:.-]/g, '') + '.mp4';
 };
 
@@ -197,13 +196,13 @@ export class VideoController {
     },
   })
   uploadUrl(): object {
-    let url = this.videoUploadService.getUploadUrl(generateFileName());
+    const url = this.videoUploadService.getUploadUrl(generateFileName());
     return {url: url};
   }
 
   private sendProcessingEmail(emailAddress: string): Promise<any> {
     const email: EmailMessage = {
-      subject: 'flexin Video Submission Received',
+      subject: 'flexin: processing your handstand now',
       html: processingTemplate(),
       to: [{email: emailAddress, type: 'to'}],
     };
@@ -212,7 +211,7 @@ export class VideoController {
 
   private sendVideoReviewedEmail(emailAddress: string, videoId: number): Promise<any> {
     const email: EmailMessage = {
-      subject: 'flexin Video Reviewed',
+      subject: 'flexin: handstand review ready',
       html: reviewedTemplate(videoId),
       to: [{email: emailAddress, type: 'to'}],
     };
