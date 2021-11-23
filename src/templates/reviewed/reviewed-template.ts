@@ -48,7 +48,7 @@ export const reviewedTemplate = (videoId: number) => {
           font-size="16px"
           line-height="28px"
           padding="0px 25px 0px 25px"
-          ><a href="www.flexin.io/review/${video.id}" style="color: white; text-decoration: underline"
+          ><a href="www.flexin.io/review/${videoId}" style="color: white; text-decoration: underline"
             >find out what your coach said</a
           >
         </mj-text>
