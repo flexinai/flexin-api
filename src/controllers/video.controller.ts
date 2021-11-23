@@ -137,9 +137,9 @@ export class VideoController {
   ): Promise<void> {
     const currentVideo = await this.videoRepository.findById(id);
     // if video status is changing from 'pending' to 'reviewed', send the 'video reviewed' email
-    if (currentVideo.status == 'pending' && video.status == 'reviewed') {
+    if (currentVideo.status === 'valid' && video.status === 'reviewed') {
       const emailResponse = await this.sendVideoReviewedEmail(currentVideo.email, id);
-      if (emailResponse[0] && emailResponse[0].status == 'sent') {
+      if (emailResponse[0] && emailResponse[0].status === 'sent') {
         video.reviewedEmailSent = new Date();
       } else {
         console.log(emailResponse);
