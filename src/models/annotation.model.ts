@@ -1,4 +1,4 @@
-import {Entity, model, property, belongsTo} from '@loopback/repository';
+import {belongsTo, Entity, model, property} from '@loopback/repository';
 import {AnnotationNote} from './annotation-note.model';
 
 @model()
@@ -38,6 +38,12 @@ export class Annotation extends Entity {
     type: 'number',
   })
   assignedToId?: number;
+
+  @property({
+    type: 'string',
+    required: false,
+  })
+  analysisUrl?: string;
 
   constructor(data?: Partial<Annotation>) {
     super(data);
