@@ -43,7 +43,7 @@ export class Annotation extends Entity {
     type: 'string',
     required: false,
   })
-  analysisUrl?: string;
+  videoCorrectionUrl?: string;
 
   constructor(data?: Partial<Annotation>) {
     super(data);
