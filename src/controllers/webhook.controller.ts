@@ -140,7 +140,7 @@ export class WebhookController {
     public videoRepository: VideoRepository,
   ) {}
 
-  @post('/webooks/tally')
+  @post('/webhooks/tally')
   @response(204, {
     description: 'Video PUT success',
   })
