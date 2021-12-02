@@ -33,7 +33,9 @@ export class VideoUploadService {
     });
     const command = new CreateJobCommand({
       Queue: "arn:aws:mediaconvert:us-east-2:816488412071:queues/Default",
-      UserMetadata: {},
+      UserMetadata: {
+        clip: `${clip.id}`
+      },
       Role: "arn:aws:iam::816488412071:role/service-role/MediaConvert_Default_Role_1",
       Settings: {
         TimecodeConfig: {
@@ -108,13 +110,9 @@ export class VideoUploadService {
       },
       StatusUpdateInterval: "SECONDS_60",
       Priority: 0,
-      Tags: {
-        clip: `${clip.id}`
-      }
     });
-    const response = await client.send(command);
-    console.log(response)
-    console.log({response})
+    await client.send(command);
+
     return clip;
   }
 }
