@@ -55,8 +55,8 @@ export class ClipController {
         videoId: video.id,
       },
     });
-    await this.videoUploadService.sendJob(video, clip)
-    return this.clipRepository.create(clip);
+    const finishedClip = await this.clipRepository.create(clip);
+    return this.videoUploadService.sendJob(video, finishedClip);
   }
 
   @get('/clips/count')

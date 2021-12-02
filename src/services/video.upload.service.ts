@@ -23,9 +23,9 @@ export class VideoUploadService {
     return url
   }
 
-  async sendJob(video: Video, clip: Omit<Clip, 'id'>) {
+  async sendJob(video: Video, clip: Clip) {
     const startTimecode = millisecondsToHHMMSSFF(clip.startMilliseconds)
-    const endTimecode = millisecondsToHHMMSSFF(clip.startMilliseconds)
+    const endTimecode = millisecondsToHHMMSSFF(clip.endMilliseconds)
     const fileInput = video.url
     const client = new MediaConvertClient({
       region: process.env.AWS_DEFAULT_REGION,
@@ -107,11 +107,14 @@ export class VideoUploadService {
         Mode: "DISABLED"
       },
       StatusUpdateInterval: "SECONDS_60",
-      Priority: 0
+      Priority: 0,
+      Tags: {
+        clip: `${clip.id}`
+      }
     });
     const response = await client.send(command);
     console.log(response)
     console.log({response})
-    return response
+    return clip;
   }
 }
