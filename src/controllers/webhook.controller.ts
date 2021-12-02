@@ -4,10 +4,10 @@ import {
 } from '@loopback/repository';
 import {post, requestBody, Response, response, RestBindings, SchemaObject} from '@loopback/rest';
 import {Video} from '../models';
-import {VideoRepository} from '../repositories';
+import {ClipRepository, VideoRepository} from '../repositories';
 
 
-/* object specification for tally */
+/* object specifications */
 type Tally = {
   eventId: string;
   eventType: string;
@@ -30,7 +30,55 @@ type Tally = {
   };
 };
 
-/* JSON schema for tally */
+type MediaConvert = {
+  version: string;
+  id: string;
+  'detail-type': string;
+  source: string;
+  account: string;
+  time: string;
+  region: string;
+  resources: string[];
+  detail: {
+    timestamp: number;
+    accountId: string;
+    queue: string;
+    jobId: string;
+    status: string;
+    userMetadata: {
+      clip: string;
+    };
+    outputGroupDetails: {
+      outputDetails: {
+        outputFilePaths: string[];
+        durationInMs: number;
+        videoDetails: {
+          widthInPx: number;
+          heightInPx: number;
+        }
+      }[];
+      type: string;
+    }[]
+  }
+  data: {
+    responseId: string;
+    submissionId: string;
+    respondentId: string;
+    formId: string;
+    formName: string;
+    createdAt: string;
+    fields: {
+      key: string;
+      label: string;
+      type: string;
+      value?: number | string | {
+        url: string;
+      }[];
+    }[]
+  };
+};
+
+/* JSON schemas */
 const TallySchema: SchemaObject = {
   type: 'object',
   properties: {
@@ -120,6 +168,107 @@ const TallySchema: SchemaObject = {
   },
 };
 
+
+const MediaConvertSchema: SchemaObject = {
+  type: 'object',
+  properties: {
+    version: {
+      type: 'string'
+    },
+    id: {
+      type: 'string'
+    },
+    "detail-type": {
+      type: 'string'
+    },
+    source: {
+      type: 'string'
+    },
+    account: {
+      type: 'string'
+    },
+    time: {
+      type: 'string'
+    },
+    region: {
+      type: 'string'
+    },
+    resources: {
+      type: 'array',
+      items: {
+        type: 'string'
+      }
+    },
+    detail: {
+      type: 'object',
+      properties: {
+        timestamp: {
+          type: 'number'
+        },
+        accountId: {
+          type: 'string'
+        },
+        queue: {
+          type: 'string'
+        },
+        jobId: {
+          type: 'string'
+        },
+        status: {
+          type: 'string'
+        },
+        userMetadata: {
+          type: 'object',
+          properties: {
+            clip: {
+              type: 'string'
+            }
+          }
+        },
+        outputGroupDetails: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                outputDetails: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    properties: {
+                      outputFilePaths: {
+                        type: 'array',
+                        items: {
+                          type: 'string'
+                        }
+                      },
+                      durationInMs: {
+                        type: 'number'
+                      },
+                      videoDetails: {
+                        type: 'object',
+                        properties: {
+                          widthInPx: {
+                            type: 'number'
+                          },
+                          heightInPx: {
+                            type: 'number'
+                          }
+                        }
+                      },
+                    }
+                  }
+                },
+                type: {
+                  type: 'string'
+                }
+              }
+            }
+          }
+      }
+    },
+  },
+};
+
 /* request bodies */
 const TallyRequestBody = {
   description: 'Required fields to post a video from tally',
@@ -131,6 +280,16 @@ const TallyRequestBody = {
   },
 };
 
+const MediaconvertRequestBody = {
+  description: 'Required fields to patch a clip from AWS MediaConvert',
+  required: true,
+  content: {
+    'application/json': {
+      schema: MediaConvertSchema,
+    },
+  },
+};
+
 
 export class WebhookController {
   constructor(
@@ -138,6 +297,8 @@ export class WebhookController {
     protected responseService: Response,
     @repository(VideoRepository)
     public videoRepository: VideoRepository,
+    @repository(ClipRepository)
+    public clipRepository: ClipRepository,
   ) {}
 
   @post('/webhooks/tally')
@@ -159,4 +320,23 @@ export class WebhookController {
     }
     return this.videoRepository.create(video);
   }
+
+  @post('/webhooks/mediaconvert')
+  @response(204, {
+    description: 'Clip PATCH success',
+  })
+  async patchFromMediaconvert(
+    @requestBody(MediaconvertRequestBody)
+    mediaConvert: MediaConvert,
+  ): Promise<void> {
+    const id = +mediaConvert.detail.userMetadata.clip
+    const s3Url: string = mediaConvert.detail.outputGroupDetails[0].outputDetails[0].outputFilePaths[0]
+    const video = s3Url.split('s3://flexin-video/')[1]
+    const url = `https://flexin-video.s3.us-east-2.amazonaws.com/${video}`
+    const clip = {
+      url
+    };
+    await this.clipRepository.updateById(id, clip);
+  }
+
 }

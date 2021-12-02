@@ -18,6 +18,18 @@ export class Clip extends Entity {
   startMilliseconds: number;
 
   @property({
+    type: 'string',
+    required: false,
+  })
+  url: string;
+
+  @property({
+    type: 'string',
+    required: false,
+  })
+  analysisUrl?: string;
+
+  @property({
     type: 'number',
     required: true,
   })
