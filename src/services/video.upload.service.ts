@@ -15,7 +15,7 @@ export class VideoUploadService {
       Key: fileName,
       ContentType: 'application/octet-stream',
     });
-
-    return getSignedUrl(client, command, { expiresIn: 300 });
+    const url = await getSignedUrl(client, command, { expiresIn: 300 });
+    return url
   }
 }
