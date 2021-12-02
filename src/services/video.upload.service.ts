@@ -89,7 +89,7 @@ export class VideoUploadService {
                     }
                   }
                 ],
-                NameModifier: "-1"
+                NameModifier: "-$t$"
               }
             ],
             OutputGroupSettings: {
