@@ -171,6 +171,8 @@ export class VideoController {
     description: 'Video DELETE success',
   })
   async deleteById(@param.path.number('id') id: number): Promise<void> {
+    const video = await this.videoRepository.findById(id);
+    await this.videoUploadService.deleteS3Video(video.url);
     await this.videoRepository.deleteById(id);
   }
 

@@ -150,6 +150,9 @@ export class ClipController {
     description: 'Clip DELETE success',
   })
   async deleteById(@param.path.number('id') id: number): Promise<void> {
+    const clip = await this.clipRepository.findById(id);
+    await this.videoUploadService.deleteS3Video(clip.url);
+    await this.videoUploadService.deleteS3Video(clip.analysisUrl);
     await this.clipRepository.deleteById(id);
   }
 }
