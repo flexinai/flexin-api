@@ -2,6 +2,10 @@ import {CreateJobCommand, MediaConvertClient} from '@aws-sdk/client-mediaconvert
 import {PutObjectCommand, S3Client} from '@aws-sdk/client-s3';
 import {getSignedUrl} from '@aws-sdk/s3-request-presigner';
 import {BindingScope, injectable} from '@loopback/core';
+import {Clip, Video} from '../models';
+import {millisecondsToHHMMSSFF} from '../utils/milliseconds-to-hhmmssff';
+
+
 
 @injectable({scope: BindingScope.TRANSIENT})
 export class VideoUploadService {
@@ -19,7 +23,10 @@ export class VideoUploadService {
     return url
   }
 
-  async sendJob() {
+  async sendJob(video: Video, clip: Omit<Clip, 'id'>) {
+    const startTimecode = millisecondsToHHMMSSFF(clip.startMilliseconds)
+    const endTimecode = millisecondsToHHMMSSFF(clip.startMilliseconds)
+    const fileInput = video.url
     const client = new MediaConvertClient({
       region: process.env.AWS_DEFAULT_REGION,
       endpoint: 'https://mqm13wgra.mediaconvert.us-east-2.amazonaws.com'
@@ -79,8 +86,8 @@ export class VideoUploadService {
           {
             InputClippings: [
               {
-                EndTimecode: "00:10:10:00",
-                StartTimecode: "00:10:00:00"
+                EndTimecode: endTimecode,
+                StartTimecode: startTimecode
               }
             ],
             AudioSelectors: {
@@ -92,7 +99,7 @@ export class VideoUploadService {
               Rotate: "AUTO"
             },
             TimecodeSource: "ZEROBASED",
-            FileInput: "s3://flexin-video/20211025T125853401Z.mp4"
+            FileInput: fileInput
           }
         ]
       },

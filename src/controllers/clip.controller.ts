@@ -55,7 +55,7 @@ export class ClipController {
         videoId: video.id,
       },
     });
-    await this.videoUploadService.sendJob()
+    await this.videoUploadService.sendJob(video, clip)
     return this.clipRepository.create(clip);
   }
 
