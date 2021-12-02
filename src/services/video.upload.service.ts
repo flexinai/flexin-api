@@ -8,7 +8,6 @@ export class VideoUploadService {
   async getUploadUrl(fileName: string): Promise<string> {
     const client = new S3Client({
       region: process.env.AWS_DEFAULT_REGION,
-      endpoint: process.env.AWS_ENDPOINT, // it could be any S3 provider
     });
     const command = new PutObjectCommand({
       Bucket: 'flexin-video',
