@@ -1,26 +1,20 @@
+import {inject} from '@loopback/core';
 import {
   Count,
   CountSchema,
   Filter,
   FilterExcludingWhere,
   repository,
-  Where,
+  Where
 } from '@loopback/repository';
 import {
-  post,
-  param,
-  get,
-  getModelSchemaRef,
-  patch,
-  put,
-  del,
-  requestBody,
-  response,
+  del, get,
+  getModelSchemaRef, param, patch, post, put, requestBody,
+  response
 } from '@loopback/rest';
 import {Clip} from '../models';
 import {ClipRepository, VideoRepository} from '../repositories';
-import {inject} from '@loopback/core';
-import {MixpanelEvent, MixpanelService} from '../services';
+import {MixpanelService, VideoUploadService} from '../services';
 
 export class ClipController {
   constructor(
@@ -30,6 +24,8 @@ export class ClipController {
     protected videoRepository: VideoRepository,
     @inject('services.MixpanelService')
     protected mixpanelService: MixpanelService,
+    @inject('services.VideoUploadService')
+    protected videoUploadService: VideoUploadService,
   ) {}
 
   @post('/clips')
@@ -59,6 +55,7 @@ export class ClipController {
         videoId: video.id,
       },
     });
+    await this.videoUploadService.sendJob()
     return this.clipRepository.create(clip);
   }
 
