@@ -1,7 +1,7 @@
 import {Entity, model, property} from '@loopback/repository';
 
 @model()
-export class AnnotationNote extends Entity {
+export class CorrectionNote extends Entity {
   @property({
     type: 'number',
     id: true,
@@ -21,13 +21,13 @@ export class AnnotationNote extends Entity {
   })
   url: string;
 
-  constructor(data?: Partial<AnnotationNote>) {
+  constructor(data?: Partial<CorrectionNote>) {
     super(data);
   }
 }
 
-export interface AnnotationNoteRelations {
+export interface CorrectionNoteRelations {
   // describe navigational properties here
 }
 
-export type AnnotationNoteWithRelations = AnnotationNote & AnnotationNoteRelations;
+export type CorrectionNoteWithRelations = CorrectionNote & CorrectionNoteRelations;

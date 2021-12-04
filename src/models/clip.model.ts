@@ -1,5 +1,5 @@
 import {belongsTo, Entity, hasMany, model, property} from '@loopback/repository';
-import {Annotation} from './correction.model';
+import {Correction} from './correction.model';
 import {Video} from './video.model';
 
 @model()
@@ -35,8 +35,8 @@ export class Clip extends Entity {
   })
   endMilliseconds: number;
 
-  @hasMany(() => Annotation)
-  annotations: Annotation[];
+  @hasMany(() => Correction)
+  corrections: Correction[];
 
   @belongsTo(() => Video)
   videoId: number;

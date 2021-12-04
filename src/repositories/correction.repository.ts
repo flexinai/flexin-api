@@ -1,22 +1,22 @@
 import {Getter, inject} from '@loopback/core';
 import {BelongsToAccessor, DefaultCrudRepository, repository} from '@loopback/repository';
 import {DbDataSource} from '../datasources';
-import {Annotation, AnnotationNote, AnnotationRelations} from '../models';
-import {AnnotationNoteRepository} from './correction-note.repository';
+import {Correction, CorrectionNote, CorrectionRelations} from '../models';
+import {CorrectionNoteRepository} from './correction-note.repository';
 
-export class AnnotationRepository extends DefaultCrudRepository<
-  Annotation,
-  typeof Annotation.prototype.id,
-  AnnotationRelations
+export class CorrectionRepository extends DefaultCrudRepository<
+  Correction,
+  typeof Correction.prototype.id,
+  CorrectionRelations
 > {
 
-  public readonly annotationNote: BelongsToAccessor<AnnotationNote, typeof Annotation.prototype.id>;
+  public readonly correctionNote: BelongsToAccessor<CorrectionNote, typeof Correction.prototype.id>;
 
   constructor(
-    @inject('datasources.db') dataSource: DbDataSource, @repository.getter('AnnotationNoteRepository') protected annotationNoteRepositoryGetter: Getter<AnnotationNoteRepository>,
+    @inject('datasources.db') dataSource: DbDataSource, @repository.getter('CorrectionNoteRepository') protected correctionNoteRepositoryGetter: Getter<CorrectionNoteRepository>,
   ) {
-    super(Annotation, dataSource);
-    this.annotationNote = this.createBelongsToAccessorFor('annotationNote', annotationNoteRepositoryGetter,);
-    this.registerInclusionResolver('annotationNote', this.annotationNote.inclusionResolver);
+    super(Correction, dataSource);
+    this.correctionNote = this.createBelongsToAccessorFor('correctionNote', correctionNoteRepositoryGetter,);
+    this.registerInclusionResolver('correctionNote', this.correctionNote.inclusionResolver);
   }
 }

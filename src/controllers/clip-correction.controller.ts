@@ -1,9 +1,10 @@
+import {inject} from '@loopback/core';
 import {
   Count,
   CountSchema,
   Filter,
   repository,
-  Where,
+  Where
 } from '@loopback/repository';
 import {
   del,
@@ -13,30 +14,26 @@ import {
   param,
   patch,
   post,
-  requestBody,
+  requestBody
 } from '@loopback/rest';
-import {
-  Clip,
-  Annotation,
-} from '../models';
+import {Clip, Correction} from '../models';
 import {ClipRepository} from '../repositories';
-import {inject} from '@loopback/core';
-import {MixpanelEvent, MixpanelService} from '../services';
+import {MixpanelService} from '../services';
 
-export class ClipAnnotationController {
+export class ClipCorrectionController {
   constructor(
     @repository(ClipRepository) protected clipRepository: ClipRepository,
     @inject('services.MixpanelService')
     protected mixpanelService: MixpanelService,
   ) {}
 
-  @get('/clips/{id}/annotations', {
+  @get('/clips/{id}/corrections', {
     responses: {
       '200': {
-        description: 'Array of Clip has many Annotation',
+        description: 'Array of Clip has many Correction',
         content: {
           'application/json': {
-            schema: {type: 'array', items: getModelSchemaRef(Annotation)},
+            schema: {type: 'array', items: getModelSchemaRef(Correction)},
           },
         },
       },
@@ -44,16 +41,16 @@ export class ClipAnnotationController {
   })
   async find(
     @param.path.number('id') id: number,
-    @param.query.object('filter') filter?: Filter<Annotation>,
-  ): Promise<Annotation[]> {
-    return this.clipRepository.annotations(id).find(filter);
+    @param.query.object('filter') filter?: Filter<Correction>,
+  ): Promise<Correction[]> {
+    return this.clipRepository.corrections(id).find(filter);
   }
 
-  @post('/clips/{id}/annotations', {
+  @post('/clips/{id}/corrections', {
     responses: {
       '200': {
         description: 'Clip model instance',
-        content: {'application/json': {schema: getModelSchemaRef(Annotation)}},
+        content: {'application/json': {schema: getModelSchemaRef(Correction)}},
       },
     },
   })
@@ -62,16 +59,16 @@ export class ClipAnnotationController {
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(Annotation, {
-            title: 'NewAnnotationInClip',
+          schema: getModelSchemaRef(Correction, {
+            title: 'NewCorrectionInClip',
             exclude: ['id'],
             optional: ['clipId'],
           }),
         },
       },
     })
-    annotation: Omit<Annotation, 'id'>,
-  ): Promise<Annotation> {
+    correction: Omit<Correction, 'id'>,
+  ): Promise<Correction> {
     const clip = await this.clipRepository.findById(id, {include: [{relation: 'video'}]});
     // log a mixpanel event
     this.mixpanelService.trackEvent({
@@ -79,13 +76,13 @@ export class ClipAnnotationController {
       distinctId: clip.video.email || 'unknown',
       additionalProperties: {videoId: clip.videoId},
     });
-    return this.clipRepository.annotations(id).create(annotation);
+    return this.clipRepository.corrections(id).create(correction);
   }
 
-  @patch('/clips/{id}/annotations', {
+  @patch('/clips/{id}/corrections', {
     responses: {
       '200': {
-        description: 'Clip.Annotation PATCH success count',
+        description: 'Clip.Correction PATCH success count',
         content: {'application/json': {schema: CountSchema}},
       },
     },
@@ -95,28 +92,28 @@ export class ClipAnnotationController {
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(Annotation, {partial: true}),
+          schema: getModelSchemaRef(Correction, {partial: true}),
         },
       },
     })
-    annotation: Partial<Annotation>,
-    @param.query.object('where', getWhereSchemaFor(Annotation)) where?: Where<Annotation>,
+    correction: Partial<Correction>,
+    @param.query.object('where', getWhereSchemaFor(Correction)) where?: Where<Correction>,
   ): Promise<Count> {
-    return this.clipRepository.annotations(id).patch(annotation, where);
+    return this.clipRepository.corrections(id).patch(correction, where);
   }
 
-  @del('/clips/{id}/annotations', {
+  @del('/clips/{id}/corrections', {
     responses: {
       '200': {
-        description: 'Clip.Annotation DELETE success count',
+        description: 'Clip.Correction DELETE success count',
         content: {'application/json': {schema: CountSchema}},
       },
     },
   })
   async delete(
     @param.path.number('id') id: number,
-    @param.query.object('where', getWhereSchemaFor(Annotation)) where?: Where<Annotation>,
+    @param.query.object('where', getWhereSchemaFor(Correction)) where?: Where<Correction>,
   ): Promise<Count> {
-    return this.clipRepository.annotations(id).delete(where);
+    return this.clipRepository.corrections(id).delete(where);
   }
 }

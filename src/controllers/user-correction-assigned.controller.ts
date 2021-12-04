@@ -1,18 +1,18 @@
 import {Count, CountSchema, Filter, repository, Where} from '@loopback/repository';
 import {del, get, getModelSchemaRef, getWhereSchemaFor, param, patch, post, requestBody} from '@loopback/rest';
-import {User, Annotation} from '../models';
+import {Correction, User} from '../models';
 import {UserRepository} from '../repositories';
 
-export class UserAnnotationAssignedController {
+export class UserCorrectionAssignedController {
   constructor(@repository(UserRepository) protected userRepository: UserRepository) {}
 
-  @get('/users/{id}/annotations-assigned', {
+  @get('/users/{id}/corrections-assigned', {
     responses: {
       '200': {
-        description: 'Array of User has many Annotation',
+        description: 'Array of User has many Correction',
         content: {
           'application/json': {
-            schema: {type: 'array', items: getModelSchemaRef(Annotation)},
+            schema: {type: 'array', items: getModelSchemaRef(Correction)},
           },
         },
       },
@@ -20,16 +20,16 @@ export class UserAnnotationAssignedController {
   })
   async find(
     @param.path.number('id') id: number,
-    @param.query.object('filter') filter?: Filter<Annotation>,
-  ): Promise<Annotation[]> {
-    return this.userRepository.annotationsAssigned(id).find(filter);
+    @param.query.object('filter') filter?: Filter<Correction>,
+  ): Promise<Correction[]> {
+    return this.userRepository.correctionsAssigned(id).find(filter);
   }
 
-  @post('/users/{id}/annotations-assigned', {
+  @post('/users/{id}/corrections-assigned', {
     responses: {
       '200': {
         description: 'User model instance',
-        content: {'application/json': {schema: getModelSchemaRef(Annotation)}},
+        content: {'application/json': {schema: getModelSchemaRef(Correction)}},
       },
     },
   })
@@ -38,23 +38,23 @@ export class UserAnnotationAssignedController {
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(Annotation, {
-            title: 'NewAnnotationInUser',
+          schema: getModelSchemaRef(Correction, {
+            title: 'NewCorrectionInUser',
             exclude: ['id'],
             optional: ['createdById'],
           }),
         },
       },
     })
-    annotation: Omit<Annotation, 'id'>,
-  ): Promise<Annotation> {
-    return this.userRepository.annotationsAssigned(id).create(annotation);
+    correction: Omit<Correction, 'id'>,
+  ): Promise<Correction> {
+    return this.userRepository.correctionsAssigned(id).create(correction);
   }
 
-  @patch('/users/{id}/annotations-assigned', {
+  @patch('/users/{id}/corrections-assigned', {
     responses: {
       '200': {
-        description: 'User.Annotation PATCH success count',
+        description: 'User.Correction PATCH success count',
         content: {'application/json': {schema: CountSchema}},
       },
     },
@@ -64,28 +64,28 @@ export class UserAnnotationAssignedController {
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(Annotation, {partial: true}),
+          schema: getModelSchemaRef(Correction, {partial: true}),
         },
       },
     })
-    annotation: Partial<Annotation>,
-    @param.query.object('where', getWhereSchemaFor(Annotation)) where?: Where<Annotation>,
+    correction: Partial<Correction>,
+    @param.query.object('where', getWhereSchemaFor(Correction)) where?: Where<Correction>,
   ): Promise<Count> {
-    return this.userRepository.annotationsAssigned(id).patch(annotation, where);
+    return this.userRepository.correctionsAssigned(id).patch(correction, where);
   }
 
-  @del('/users/{id}/annotations-assigned', {
+  @del('/users/{id}/corrections-assigned', {
     responses: {
       '200': {
-        description: 'User.Annotation DELETE success count',
+        description: 'User.Correction DELETE success count',
         content: {'application/json': {schema: CountSchema}},
       },
     },
   })
   async delete(
     @param.path.number('id') id: number,
-    @param.query.object('where', getWhereSchemaFor(Annotation)) where?: Where<Annotation>,
+    @param.query.object('where', getWhereSchemaFor(Correction)) where?: Where<Correction>,
   ): Promise<Count> {
-    return this.userRepository.annotationsAssigned(id).delete(where);
+    return this.userRepository.correctionsAssigned(id).delete(where);
   }
 }

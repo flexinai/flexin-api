@@ -1,16 +1,16 @@
 import {inject} from '@loopback/core';
 import {DefaultCrudRepository} from '@loopback/repository';
 import {DbDataSource} from '../datasources';
-import {AnnotationNote, AnnotationNoteRelations} from '../models';
+import {CorrectionNote, CorrectionNoteRelations} from '../models';
 
-export class AnnotationNoteRepository extends DefaultCrudRepository<
-  AnnotationNote,
-  typeof AnnotationNote.prototype.id,
-  AnnotationNoteRelations
+export class CorrectionNoteRepository extends DefaultCrudRepository<
+  CorrectionNote,
+  typeof CorrectionNote.prototype.id,
+  CorrectionNoteRelations
 > {
   constructor(
     @inject('datasources.db') dataSource: DbDataSource,
   ) {
-    super(AnnotationNote, dataSource);
+    super(CorrectionNote, dataSource);
   }
 }

@@ -1,38 +1,37 @@
 import {
-  repository,
+  repository
 } from '@loopback/repository';
 import {
-  param,
   get,
-  getModelSchemaRef,
+  getModelSchemaRef, param
 } from '@loopback/rest';
 import {
-  Annotation,
-  AnnotationNote,
+  Correction,
+  CorrectionNote
 } from '../models';
-import {AnnotationRepository} from '../repositories';
+import {CorrectionRepository} from '../repositories';
 
-export class AnnotationAnnotationNoteController {
+export class CorrectionCorrectionNoteController {
   constructor(
-    @repository(AnnotationRepository)
-    public annotationRepository: AnnotationRepository,
+    @repository(CorrectionRepository)
+    public correctionRepository: CorrectionRepository,
   ) { }
 
-  @get('/annotations/{id}/annotation-note', {
+  @get('/corrections/{id}/correction-note', {
     responses: {
       '200': {
-        description: 'AnnotationNote belonging to Annotation',
+        description: 'CorrectionNote belonging to Correction',
         content: {
           'application/json': {
-            schema: {type: 'array', items: getModelSchemaRef(AnnotationNote)},
+            schema: {type: 'array', items: getModelSchemaRef(CorrectionNote)},
           },
         },
       },
     },
   })
-  async getAnnotationNote(
-    @param.path.number('id') id: typeof Annotation.prototype.id,
-  ): Promise<AnnotationNote> {
-    return this.annotationRepository.annotationNote(id);
+  async getCorrectionNote(
+    @param.path.number('id') id: typeof Correction.prototype.id,
+  ): Promise<CorrectionNote> {
+    return this.correctionRepository.correctionNote(id);
   }
 }
