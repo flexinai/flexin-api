@@ -1,5 +1,5 @@
 import {belongsTo, Entity, hasMany, model, property} from '@loopback/repository';
-import {Annotation} from './annotation.model';
+import {Annotation} from './correction.model';
 import {Video} from './video.model';
 
 @model()

@@ -9,10 +9,10 @@ import {
   HasManyRepositoryFactory, HasOneRepositoryFactory, repository
 } from '@loopback/repository';
 import {DbDataSource} from '../datasources';
-import {User, UserCredentials, UserIdentity, Annotation, Video} from '../models';
+import {Annotation, User, UserCredentials, UserIdentity, Video} from '../models';
+import {AnnotationRepository} from './correction.repository';
 import {UserCredentialsRepository} from './user-credentials.repository';
 import {UserIdentityRepository} from './user-identity.repository';
-import {AnnotationRepository} from './annotation.repository';
 import {VideoRepository} from './video.repository';
 
 export class UserRepository extends DefaultCrudRepository<
