@@ -1,8 +1,8 @@
-import {inject, Getter} from '@loopback/core';
-import {DefaultCrudRepository, repository, BelongsToAccessor} from '@loopback/repository';
+import {Getter, inject} from '@loopback/core';
+import {BelongsToAccessor, DefaultCrudRepository, repository} from '@loopback/repository';
 import {DbDataSource} from '../datasources';
-import {Annotation, AnnotationRelations, AnnotationNote} from '../models';
-import {AnnotationNoteRepository} from './annotation-note.repository';
+import {Annotation, AnnotationNote, AnnotationRelations} from '../models';
+import {AnnotationNoteRepository} from './correction-note.repository';
 
 export class AnnotationRepository extends DefaultCrudRepository<
   Annotation,

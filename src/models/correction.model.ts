@@ -1,5 +1,5 @@
 import {belongsTo, Entity, model, property} from '@loopback/repository';
-import {AnnotationNote} from './annotation-note.model';
+import {AnnotationNote} from './correction-note.model';
 
 @model()
 export class Annotation extends Entity {

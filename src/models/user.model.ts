@@ -4,9 +4,9 @@
 // License text available at https://opensource.org/licenses/MIT
 
 import {Entity, hasMany, hasOne, model, property} from '@loopback/repository';
+import {Annotation} from './correction.model';
 import {UserCredentials} from './user-credentials.model';
 import {UserIdentity} from './user-identity.model';
-import {Annotation} from './annotation.model';
 import {Video} from './video.model';
 
 @model()
