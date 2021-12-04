@@ -4,7 +4,7 @@
 // License text available at https://opensource.org/licenses/MIT
 
 import {Entity, hasMany, hasOne, model, property} from '@loopback/repository';
-import {Annotation} from './correction.model';
+import {Correction} from './correction.model';
 import {UserCredentials} from './user-credentials.model';
 import {UserIdentity} from './user-identity.model';
 import {Video} from './video.model';
@@ -61,11 +61,11 @@ export class User extends Entity {
   })
   roles?: string[];
 
-  @hasMany(() => Annotation, {keyTo: 'createdById'})
-  annotationsCreated: Annotation[];
+  @hasMany(() => Correction, {keyTo: 'createdById'})
+  correctionsCreated: Correction[];
 
-  @hasMany(() => Annotation, {keyTo: 'assignedToId'})
-  annotationsAssigned: Annotation[];
+  @hasMany(() => Correction, {keyTo: 'assignedToId'})
+  correctionsAssigned: Correction[];
 
   @hasMany(() => Video, {keyTo: 'reviewedById'})
   videosReviewed: Video[];

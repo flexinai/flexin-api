@@ -4,147 +4,141 @@ import {
   Filter,
   FilterExcludingWhere,
   repository,
-  Where,
+  Where
 } from '@loopback/repository';
 import {
-  post,
-  param,
-  get,
-  getModelSchemaRef,
-  patch,
-  put,
-  del,
-  requestBody,
-  response,
+  del, get,
+  getModelSchemaRef, param, patch, post, put, requestBody,
+  response
 } from '@loopback/rest';
-import {AnnotationNote} from '../models';
-import {AnnotationNoteRepository} from '../repositories';
+import {CorrectionNote} from '../models';
+import {CorrectionNoteRepository} from '../repositories';
 
-export class AnnotationNoteController {
+export class CorrectionNoteController {
   constructor(
-    @repository(AnnotationNoteRepository)
-    public annotationNoteRepository : AnnotationNoteRepository,
+    @repository(CorrectionNoteRepository)
+    public correctionNoteRepository : CorrectionNoteRepository,
   ) {}
 
-  @post('/annotation-notes')
+  @post('/correction-notes')
   @response(200, {
-    description: 'AnnotationNote model instance',
-    content: {'application/json': {schema: getModelSchemaRef(AnnotationNote)}},
+    description: 'CorrectionNote model instance',
+    content: {'application/json': {schema: getModelSchemaRef(CorrectionNote)}},
   })
   async create(
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(AnnotationNote, {
-            title: 'NewAnnotationNote',
+          schema: getModelSchemaRef(CorrectionNote, {
+            title: 'NewCorrectionNote',
             exclude: ['id'],
           }),
         },
       },
     })
-    annotationNote: Omit<AnnotationNote, 'id'>,
-  ): Promise<AnnotationNote> {
-    return this.annotationNoteRepository.create(annotationNote);
+    correctionNote: Omit<CorrectionNote, 'id'>,
+  ): Promise<CorrectionNote> {
+    return this.correctionNoteRepository.create(correctionNote);
   }
 
-  @get('/annotation-notes/count')
+  @get('/correction-notes/count')
   @response(200, {
-    description: 'AnnotationNote model count',
+    description: 'CorrectionNote model count',
     content: {'application/json': {schema: CountSchema}},
   })
   async count(
-    @param.where(AnnotationNote) where?: Where<AnnotationNote>,
+    @param.where(CorrectionNote) where?: Where<CorrectionNote>,
   ): Promise<Count> {
-    return this.annotationNoteRepository.count(where);
+    return this.correctionNoteRepository.count(where);
   }
 
-  @get('/annotation-notes')
+  @get('/correction-notes')
   @response(200, {
-    description: 'Array of AnnotationNote model instances',
+    description: 'Array of CorrectionNote model instances',
     content: {
       'application/json': {
         schema: {
           type: 'array',
-          items: getModelSchemaRef(AnnotationNote, {includeRelations: true}),
+          items: getModelSchemaRef(CorrectionNote, {includeRelations: true}),
         },
       },
     },
   })
   async find(
-    @param.filter(AnnotationNote) filter?: Filter<AnnotationNote>,
-  ): Promise<AnnotationNote[]> {
-    return this.annotationNoteRepository.find(filter);
+    @param.filter(CorrectionNote) filter?: Filter<CorrectionNote>,
+  ): Promise<CorrectionNote[]> {
+    return this.correctionNoteRepository.find(filter);
   }
 
-  @patch('/annotation-notes')
+  @patch('/correction-notes')
   @response(200, {
-    description: 'AnnotationNote PATCH success count',
+    description: 'CorrectionNote PATCH success count',
     content: {'application/json': {schema: CountSchema}},
   })
   async updateAll(
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(AnnotationNote, {partial: true}),
+          schema: getModelSchemaRef(CorrectionNote, {partial: true}),
         },
       },
     })
-    annotationNote: AnnotationNote,
-    @param.where(AnnotationNote) where?: Where<AnnotationNote>,
+    correctionNote: CorrectionNote,
+    @param.where(CorrectionNote) where?: Where<CorrectionNote>,
   ): Promise<Count> {
-    return this.annotationNoteRepository.updateAll(annotationNote, where);
+    return this.correctionNoteRepository.updateAll(correctionNote, where);
   }
 
-  @get('/annotation-notes/{id}')
+  @get('/correction-notes/{id}')
   @response(200, {
-    description: 'AnnotationNote model instance',
+    description: 'CorrectionNote model instance',
     content: {
       'application/json': {
-        schema: getModelSchemaRef(AnnotationNote, {includeRelations: true}),
+        schema: getModelSchemaRef(CorrectionNote, {includeRelations: true}),
       },
     },
   })
   async findById(
     @param.path.number('id') id: number,
-    @param.filter(AnnotationNote, {exclude: 'where'}) filter?: FilterExcludingWhere<AnnotationNote>
-  ): Promise<AnnotationNote> {
-    return this.annotationNoteRepository.findById(id, filter);
+    @param.filter(CorrectionNote, {exclude: 'where'}) filter?: FilterExcludingWhere<CorrectionNote>
+  ): Promise<CorrectionNote> {
+    return this.correctionNoteRepository.findById(id, filter);
   }
 
-  @patch('/annotation-notes/{id}')
+  @patch('/correction-notes/{id}')
   @response(204, {
-    description: 'AnnotationNote PATCH success',
+    description: 'CorrectionNote PATCH success',
   })
   async updateById(
     @param.path.number('id') id: number,
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(AnnotationNote, {partial: true}),
+          schema: getModelSchemaRef(CorrectionNote, {partial: true}),
         },
       },
     })
-    annotationNote: AnnotationNote,
+    correctionNote: CorrectionNote,
   ): Promise<void> {
-    await this.annotationNoteRepository.updateById(id, annotationNote);
+    await this.correctionNoteRepository.updateById(id, correctionNote);
   }
 
-  @put('/annotation-notes/{id}')
+  @put('/correction-notes/{id}')
   @response(204, {
-    description: 'AnnotationNote PUT success',
+    description: 'CorrectionNote PUT success',
   })
   async replaceById(
     @param.path.number('id') id: number,
-    @requestBody() annotationNote: AnnotationNote,
+    @requestBody() correctionNote: CorrectionNote,
   ): Promise<void> {
-    await this.annotationNoteRepository.replaceById(id, annotationNote);
+    await this.correctionNoteRepository.replaceById(id, correctionNote);
   }
 
-  @del('/annotation-notes/{id}')
+  @del('/correction-notes/{id}')
   @response(204, {
-    description: 'AnnotationNote DELETE success',
+    description: 'CorrectionNote DELETE success',
   })
   async deleteById(@param.path.number('id') id: number): Promise<void> {
-    await this.annotationNoteRepository.deleteById(id);
+    await this.correctionNoteRepository.deleteById(id);
   }
 }

@@ -1,8 +1,8 @@
 import {belongsTo, Entity, model, property} from '@loopback/repository';
-import {AnnotationNote} from './correction-note.model';
+import {CorrectionNote} from './correction-note.model';
 
 @model()
-export class Annotation extends Entity {
+export class Correction extends Entity {
   @property({
     type: 'number',
     id: true,
@@ -26,8 +26,8 @@ export class Annotation extends Entity {
   })
   comment?: string;
 
-  @belongsTo(() => AnnotationNote)
-  annotationNoteId: number;
+  @belongsTo(() => CorrectionNote)
+  correctionNoteId: number;
 
   @property({
     type: 'number',
@@ -45,13 +45,13 @@ export class Annotation extends Entity {
   })
   videoCorrectionUrl?: string;
 
-  constructor(data?: Partial<Annotation>) {
+  constructor(data?: Partial<Correction>) {
     super(data);
   }
 }
 
-export interface AnnotationRelations {
+export interface CorrectionRelations {
   // describe navigational properties here
 }
 
-export type AnnotationWithRelations = Annotation & AnnotationRelations;
+export type CorrectionWithRelations = Correction & CorrectionRelations;

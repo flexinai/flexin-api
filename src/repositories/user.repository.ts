@@ -9,8 +9,8 @@ import {
   HasManyRepositoryFactory, HasOneRepositoryFactory, repository
 } from '@loopback/repository';
 import {DbDataSource} from '../datasources';
-import {Annotation, User, UserCredentials, UserIdentity, Video} from '../models';
-import {AnnotationRepository} from './correction.repository';
+import {Correction, User, UserCredentials, UserIdentity, Video} from '../models';
+import {CorrectionRepository} from './correction.repository';
 import {UserCredentialsRepository} from './user-credentials.repository';
 import {UserIdentityRepository} from './user-identity.repository';
 import {VideoRepository} from './video.repository';
@@ -29,9 +29,9 @@ export class UserRepository extends DefaultCrudRepository<
     typeof User.prototype.id
   >;
 
-  public readonly annotationsCreated: HasManyRepositoryFactory<Annotation, typeof User.prototype.id>;
+  public readonly correctionsCreated: HasManyRepositoryFactory<Correction, typeof User.prototype.id>;
 
-  public readonly annotationsAssigned: HasManyRepositoryFactory<Annotation, typeof User.prototype.id>;
+  public readonly correctionsAssigned: HasManyRepositoryFactory<Correction, typeof User.prototype.id>;
 
   public readonly videosReviewed: HasManyRepositoryFactory<Video, typeof User.prototype.id>;
 
@@ -40,15 +40,15 @@ export class UserRepository extends DefaultCrudRepository<
     @repository.getter('UserIdentityRepository')
     protected profilesGetter: Getter<UserIdentityRepository>,
     @repository.getter('UserCredentialsRepository')
-    protected credentialsGetter: Getter<UserCredentialsRepository>, @repository.getter('AnnotationRepository') protected annotationRepositoryGetter: Getter<AnnotationRepository>, @repository.getter('VideoRepository') protected videoRepositoryGetter: Getter<VideoRepository>,
+    protected credentialsGetter: Getter<UserCredentialsRepository>, @repository.getter('CorrectionRepository') protected correctionRepositoryGetter: Getter<CorrectionRepository>, @repository.getter('VideoRepository') protected videoRepositoryGetter: Getter<VideoRepository>,
   ) {
     super(User, dataSource);
     this.videosReviewed = this.createHasManyRepositoryFactoryFor('videosReviewed', videoRepositoryGetter,);
     this.registerInclusionResolver('videosReviewed', this.videosReviewed.inclusionResolver);
-    this.annotationsAssigned = this.createHasManyRepositoryFactoryFor('annotationsAssigned', annotationRepositoryGetter,);
-    this.registerInclusionResolver('annotationsAssigned', this.annotationsAssigned.inclusionResolver);
-    this.annotationsCreated = this.createHasManyRepositoryFactoryFor('annotationsCreated', annotationRepositoryGetter,);
-    this.registerInclusionResolver('annotationsCreated', this.annotationsCreated.inclusionResolver);
+    this.correctionsAssigned = this.createHasManyRepositoryFactoryFor('correctionsAssigned', correctionRepositoryGetter,);
+    this.registerInclusionResolver('correctionsAssigned', this.correctionsAssigned.inclusionResolver);
+    this.correctionsCreated = this.createHasManyRepositoryFactoryFor('correctionsCreated', correctionRepositoryGetter,);
+    this.registerInclusionResolver('correctionsCreated', this.correctionsCreated.inclusionResolver);
     this.profiles = this.createHasManyRepositoryFactoryFor(
       'profiles',
       profilesGetter,

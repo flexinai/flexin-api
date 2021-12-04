@@ -1,56 +1,50 @@
+import {inject} from '@loopback/core';
 import {
   Count,
   CountSchema,
   Filter,
   FilterExcludingWhere,
   repository,
-  Where,
+  Where
 } from '@loopback/repository';
 import {
-  post,
-  param,
-  get,
-  getModelSchemaRef,
-  patch,
-  put,
-  del,
-  requestBody,
-  response,
+  del, get,
+  getModelSchemaRef, param, patch, post, put, requestBody,
+  response
 } from '@loopback/rest';
-import {Annotation} from '../models';
-import {AnnotationRepository, ClipRepository} from '../repositories';
-import {inject} from '@loopback/core';
-import {MixpanelEvent, MixpanelService} from '../services';
+import {Correction} from '../models';
+import {ClipRepository, CorrectionRepository} from '../repositories';
+import {MixpanelService} from '../services';
 
-export class AnnotationController {
+export class CorrectionController {
   constructor(
-    @repository(AnnotationRepository)
-    public annotationRepository: AnnotationRepository,
+    @repository(CorrectionRepository)
+    public correctionRepository: CorrectionRepository,
     @repository(ClipRepository)
     protected clipRepository: ClipRepository,
     @inject('services.MixpanelService')
     protected mixpanelService: MixpanelService,
   ) {}
 
-  @post('/annotations')
+  @post('/corrections')
   @response(200, {
-    description: 'Annotation model instance',
-    content: {'application/json': {schema: getModelSchemaRef(Annotation)}},
+    description: 'Correction model instance',
+    content: {'application/json': {schema: getModelSchemaRef(Correction)}},
   })
   async create(
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(Annotation, {
-            title: 'NewAnnotation',
+          schema: getModelSchemaRef(Correction, {
+            title: 'NewCorrection',
             exclude: ['id'],
           }),
         },
       },
     })
-    annotation: Omit<Annotation, 'id'>,
-  ): Promise<Annotation> {
-    const clip = await this.clipRepository.findById(annotation.clipId, {
+    correction: Omit<Correction, 'id'>,
+  ): Promise<Correction> {
+    const clip = await this.clipRepository.findById(correction.clipId, {
       include: [{relation: 'video'}],
     });
     // log a mixpanel event
@@ -59,100 +53,100 @@ export class AnnotationController {
       distinctId: clip.video.email || 'unknown',
       additionalProperties: {videoId: clip.videoId},
     });
-    return this.annotationRepository.create(annotation);
+    return this.correctionRepository.create(correction);
   }
 
-  @get('/annotations/count')
+  @get('/corrections/count')
   @response(200, {
-    description: 'Annotation model count',
+    description: 'Correction model count',
     content: {'application/json': {schema: CountSchema}},
   })
-  async count(@param.where(Annotation) where?: Where<Annotation>): Promise<Count> {
-    return this.annotationRepository.count(where);
+  async count(@param.where(Correction) where?: Where<Correction>): Promise<Count> {
+    return this.correctionRepository.count(where);
   }
 
-  @get('/annotations')
+  @get('/corrections')
   @response(200, {
-    description: 'Array of Annotation model instances',
+    description: 'Array of Correction model instances',
     content: {
       'application/json': {
         schema: {
           type: 'array',
-          items: getModelSchemaRef(Annotation, {includeRelations: true}),
+          items: getModelSchemaRef(Correction, {includeRelations: true}),
         },
       },
     },
   })
-  async find(@param.filter(Annotation) filter?: Filter<Annotation>): Promise<Annotation[]> {
-    return this.annotationRepository.find(filter);
+  async find(@param.filter(Correction) filter?: Filter<Correction>): Promise<Correction[]> {
+    return this.correctionRepository.find(filter);
   }
 
-  @patch('/annotations')
+  @patch('/corrections')
   @response(200, {
-    description: 'Annotation PATCH success count',
+    description: 'Correction PATCH success count',
     content: {'application/json': {schema: CountSchema}},
   })
   async updateAll(
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(Annotation, {partial: true}),
+          schema: getModelSchemaRef(Correction, {partial: true}),
         },
       },
     })
-    annotation: Annotation,
-    @param.where(Annotation) where?: Where<Annotation>,
+    correction: Correction,
+    @param.where(Correction) where?: Where<Correction>,
   ): Promise<Count> {
-    return this.annotationRepository.updateAll(annotation, where);
+    return this.correctionRepository.updateAll(correction, where);
   }
 
-  @get('/annotations/{id}')
+  @get('/corrections/{id}')
   @response(200, {
-    description: 'Annotation model instance',
+    description: 'Correction model instance',
     content: {
       'application/json': {
-        schema: getModelSchemaRef(Annotation, {includeRelations: true}),
+        schema: getModelSchemaRef(Correction, {includeRelations: true}),
       },
     },
   })
   async findById(
     @param.path.number('id') id: number,
-    @param.filter(Annotation, {exclude: 'where'}) filter?: FilterExcludingWhere<Annotation>,
-  ): Promise<Annotation> {
-    return this.annotationRepository.findById(id, filter);
+    @param.filter(Correction, {exclude: 'where'}) filter?: FilterExcludingWhere<Correction>,
+  ): Promise<Correction> {
+    return this.correctionRepository.findById(id, filter);
   }
 
-  @patch('/annotations/{id}')
+  @patch('/corrections/{id}')
   @response(204, {
-    description: 'Annotation PATCH success',
+    description: 'Correction PATCH success',
   })
   async updateById(
     @param.path.number('id') id: number,
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(Annotation, {partial: true}),
+          schema: getModelSchemaRef(Correction, {partial: true}),
         },
       },
     })
-    annotation: Annotation,
+    correction: Correction,
   ): Promise<void> {
-    await this.annotationRepository.updateById(id, annotation);
+    await this.correctionRepository.updateById(id, correction);
   }
 
-  @put('/annotations/{id}')
+  @put('/corrections/{id}')
   @response(204, {
-    description: 'Annotation PUT success',
+    description: 'Correction PUT success',
   })
-  async replaceById(@param.path.number('id') id: number, @requestBody() annotation: Annotation): Promise<void> {
-    await this.annotationRepository.replaceById(id, annotation);
+  async replaceById(@param.path.number('id') id: number, @requestBody() correction: Correction): Promise<void> {
+    await this.correctionRepository.replaceById(id, correction);
   }
 
-  @del('/annotations/{id}')
+  @del('/corrections/{id}')
   @response(204, {
-    description: 'Annotation DELETE success',
+    description: 'Correction DELETE success',
   })
   async deleteById(@param.path.number('id') id: number): Promise<void> {
-    await this.annotationRepository.deleteById(id);
+    await this.correctionRepository.deleteById(id);
   }
 }
