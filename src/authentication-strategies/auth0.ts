@@ -14,13 +14,14 @@ export class JWTAuthenticationStrategy implements AuthenticationStrategy {
     @inject(RestBindings.Http.RESPONSE)
     private response: Response,
     @inject(AuthenticationBindings.METADATA)
-    private metadata: AuthenticationMetadata,
+    private metadata: AuthenticationMetadata[],
     @inject(JWT_SERVICE)
     private jwtCheck: ExpressRequestHandler,
   ) {
   }
 
   async authenticate(request: Request): Promise<UserProfile | undefined> {
+
     return new Promise<UserProfile | undefined>((resolve, reject) => {
       this.jwtCheck(request, this.response, (err: unknown) => {
         if (err) {
@@ -29,8 +30,8 @@ export class JWTAuthenticationStrategy implements AuthenticationStrategy {
           return;
         }
         // If the `@authenticate` requires `scopes` check
-        if (this.metadata.options?.scopes) {
-          jwtAuthz(this.metadata.options!.scopes, {failWithError: true})(
+        if (this.metadata[0].options?.scopes) {
+          jwtAuthz(this.metadata[0].options!.scopes, {failWithError: true, customScopeKey: 'permissions'})(
             request,
             this.response,
             (err2?: Error) => {

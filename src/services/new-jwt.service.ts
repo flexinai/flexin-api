@@ -18,7 +18,7 @@ export class JWTServiceProvider implements Provider<RequestHandler> {
   ) {}
 
   value() {
-    const auth0Config = this.options || {};
+    const auth0Config = this.options ?? {};
     // Use `express-jwt` to verify the Auth0 JWT token
     return jwt({
       secret: jwks.expressJwtSecret({

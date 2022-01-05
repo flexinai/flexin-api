@@ -1,3 +1,4 @@
+import {authenticate} from '@loopback/authentication';
 import {inject} from '@loopback/core';
 import {
   Count,
@@ -69,6 +70,7 @@ export class VideoController {
     return this.videoRepository.count(where);
   }
 
+  @authenticate({strategy: 'auth0-jwt', options: {scopes: ['read:videos']}})
   @get('/videos')
   @response(200, {
     description: 'Array of Video model instances',
@@ -176,7 +178,6 @@ export class VideoController {
     await this.videoRepository.deleteById(id);
   }
 
-  // @authenticate('jwt')
   @get('/videos/upload-url', {
     responses: {
       '200': {
