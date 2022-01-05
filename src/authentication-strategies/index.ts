@@ -3,6 +3,6 @@
 // This file is licensed under the MIT License.
 // License text available at https://opensource.org/licenses/MIT
 
-export * from './google';
-export * from './oauth2';
+export * from './auth0';
 export * from './types';
+

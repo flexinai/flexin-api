@@ -1,30 +1,18 @@
+import {AuthenticationComponent, registerAuthenticationStrategy} from '@loopback/authentication';
 import {BootMixin} from '@loopback/boot';
 import {ApplicationConfig} from '@loopback/core';
-import {
-  RestExplorerBindings,
-  RestExplorerComponent,
-} from '@loopback/rest-explorer';
 import {RepositoryMixin} from '@loopback/repository';
 import {RestApplication} from '@loopback/rest';
+import {
+  RestExplorerBindings,
+  RestExplorerComponent
+} from '@loopback/rest-explorer';
 import {ServiceMixin} from '@loopback/service-proxy';
 import path from 'path';
+import {JWTAuthenticationStrategy, KEY} from './authentication-strategies';
 import {MySequence} from './sequence';
+import {JWTServiceProvider} from './services';
 
-// --- Authentication ----
-import {createBindingFromClass} from '@loopback/core';
-import {AuthenticationComponent} from '@loopback/authentication';
-import {
-  Oauth2AuthStrategy,
-  GoogleOauth2Authentication,
-} from './authentication-strategies';
-import {CustomOauth2, GoogleOauth} from './authentication-strategy-providers';
-import {JWTService, PassportUserIdentityService, UserServiceBindings} from './services';
-import passport from 'passport';
-import {
-  JWTAuthenticationComponent,
-  TokenServiceBindings,
-} from '@loopback/authentication-jwt';
-import {AuthorizationComponent} from '@loopback/authorization';
 // ----------------------
 
 export {ApplicationConfig};
@@ -35,30 +23,21 @@ export class FlexinApiApplication extends BootMixin(
   constructor(options: ApplicationConfig = {}) {
     super(options);
 
-    // ---- Authentication ----
+    // ---- Auth0 ----
+     // Bind authentication component related elements
+     this.component(AuthenticationComponent);
 
-    // get oAuth configuration
-    let oAuth2Providers = require('../oauth2-providers.json');
-    oAuth2Providers['google-login'].clientID = process.env.CLIENT_ID;
-    oAuth2Providers['google-login'].clientSecret = process.env.CLIENT_SECRET;
+     this.service(JWTServiceProvider);
 
-    this.component(AuthenticationComponent);
-    this.component(JWTAuthenticationComponent);
-    this.component(AuthorizationComponent);
-    this.setUpBindings();
+     // Register the Auth0 JWT authentication strategy
+     registerAuthenticationStrategy(this, JWTAuthenticationStrategy);
 
-    this.bind('googleOAuth2Options').to(oAuth2Providers['google-login']);
-    this.bind('customOAuth2Options').to(oAuth2Providers['oauth2']);
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    passport.serializeUser(function (user: any, done) {
-      done(null, user);
-    });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    passport.deserializeUser(function (user: any, done) {
-      done(null, user);
-    });
-    // -------------------------
+     this.configure(KEY).to({
+       jwksUri: 'https://dev-e-vh6xi2.us.auth0.com/.well-known/jwks.json',
+       audience: 'https://api.flexin.io',
+       issuer: 'https://dev-e-vh6xi2.us.auth0.com/',
+       algorithms: ['RS256']
+     });
 
     // Set up the custom sequence
     this.sequence(MySequence);
@@ -82,22 +61,5 @@ export class FlexinApiApplication extends BootMixin(
         nested: true,
       },
     };
-  }
-
-  setUpBindings(): void {
-    this.bind(UserServiceBindings.PASSPORT_USER_IDENTITY_SERVICE).toClass(
-      PassportUserIdentityService,
-    );
-    // JWT
-    this.bind(TokenServiceBindings.TOKEN_SERVICE).toClass(JWTService);
-    this.bind(TokenServiceBindings.TOKEN_SECRET).to(
-      process.env.TOKEN_SECRET || 'SuperSecureTokens3cr3t',
-    );
-    // passport strategies
-    this.add(createBindingFromClass(GoogleOauth, {key: 'googleStrategy'}));
-    this.add(createBindingFromClass(CustomOauth2, {key: 'oauth2Strategy'}));
-    // LoopBack 4 style authentication strategies
-    this.add(createBindingFromClass(GoogleOauth2Authentication));
-    this.add(createBindingFromClass(Oauth2AuthStrategy));
   }
 }

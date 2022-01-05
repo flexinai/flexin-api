@@ -3,11 +3,12 @@
 // This file is licensed under the MIT License.
 // License text available at https://opensource.org/licenses/MIT
 
-export * from './user.service';
-export * from './keys';
-export * from './jwt.service';
 export * from './basic.authorizer.service';
-export * from './notion.service';
-export * from './mixpanel.service';
-export * from './video.upload.service';
 export * from './email.service';
+export * from './mixpanel.service';
+export * from './new-jwt.service';
+export * from './notion.service';
+export * from './user.service';
+export * from './video.upload.service';
+
+

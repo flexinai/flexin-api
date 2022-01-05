@@ -5,7 +5,6 @@ export * from './correction-correction-note.controller';
 export * from './correction-note.controller';
 export * from './correction.controller';
 export * from './notion.controller';
-export * from './oauth2.controller';
 export * from './ping.controller';
 export * from './self.controller';
 export * from './user-correction-assigned.controller';
