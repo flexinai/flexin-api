@@ -312,7 +312,7 @@ export class WebhookController {
     const fileUpload = tally.data.fields.find(field => field.type === 'FILE_UPLOAD')?.value as { url: string }[]
     const {url} = fileUpload[0]
     const email = tally.data.fields.find(field => field.type === 'INPUT_EMAIL')?.value as string
-    const reviewedById = tally.data.fields.find(field => field.type === 'INPUT_NUMBER')?.value as number
+    const reviewedById = tally.data.fields.find(field => field.type === 'INPUT_NUMBER')?.value as string
     const video: Partial<Video> = {
       url,
       email,

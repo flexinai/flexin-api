@@ -30,9 +30,9 @@ export class Correction extends Entity {
   correctionNoteId: number;
 
   @property({
-    type: 'number',
+    type: 'string',
   })
-  createdById?: number;
+  createdById?: string;
 
   @property({
     type: 'number',

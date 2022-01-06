@@ -1,17 +1,8 @@
 import {authenticate} from '@loopback/authentication';
 import {
-  Count,
-  CountSchema,
-  Filter, repository,
-  Where
-} from '@loopback/repository';
-import {
-  get,
-  getModelSchemaRef, param
+  get
 } from '@loopback/rest';
-import {ManagementClient} from 'auth0';
-import {User} from '../models';
-import {UserRepository} from '../repositories';
+import {ManagementClient, User} from 'auth0';
 
 const management = new ManagementClient({
   clientId: 'ospPrIAuZWQqMOh3RYDeILRTQR5CSY3i',
@@ -20,25 +11,6 @@ const management = new ManagementClient({
 });
 
 export class UserController {
-  constructor(
-    @repository(UserRepository)
-    public userRepository : UserRepository,
-  ) {}
-
-  @get('/users/count', {
-    responses: {
-      '200': {
-        description: 'User model count',
-        content: {'application/json': {schema: CountSchema}},
-      },
-    },
-  })
-  async count(
-    @param.where(User) where?: Where<User>,
-  ): Promise<Count> {
-    return this.userRepository.count(where);
-  }
-
   @authenticate({strategy: 'auth0-jwt', options: {scopes: ['read:users']}})
   @get('/users/coach', {
     responses: {
@@ -48,7 +20,9 @@ export class UserController {
           'application/json': {
             schema: {
               type: 'array',
-              items: getModelSchemaRef(User, {includeRelations: true}),
+              items: {
+                type: 'object'
+              }
             },
           },
         },
@@ -56,8 +30,7 @@ export class UserController {
     },
   })
   async find(
-    @param.filter(User) filter?: Filter<User>,
-  ): Promise<void | any[]> {
+  ): Promise<void | User[]> {
     return management
       .getUsersInRole({
         id: 'rol_sS8Czj1uRntdt7dF'
