@@ -40,7 +40,6 @@ export class UserController {
       });
   }
 
-  @authenticate({strategy: 'auth0-jwt', options: {scopes: ['read:users']}})
   @get('/users/coach/{id}', {
     responses: {
       '200': {
