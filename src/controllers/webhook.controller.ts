@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import {inject} from '@loopback/core';
 import {
   repository
@@ -77,6 +78,23 @@ type MediaConvert = {
     }[]
   };
 };
+
+type Stripe = {
+  data: {
+    object: {
+       billing_details: {
+         email: string;
+       };
+       metadata: {
+         reviewedById: string;
+       };
+       customer_details: {
+         email: string;
+       };
+    };
+  };
+};
+
 
 /* JSON schemas */
 const TallySchema: SchemaObject = {
@@ -269,6 +287,29 @@ const MediaConvertSchema: SchemaObject = {
   },
 };
 
+
+const StripeSchema: SchemaObject = {
+  type: 'object',
+  properties: {
+    billing_details: {
+      type: 'object',
+      properties: {
+        email: {
+          type: 'string'
+        }
+      }
+    },
+    metadata: {
+      type: 'object',
+      properties: {
+        reviewedById: {
+          type: 'string'
+        }
+      }
+    }
+  }
+};
+
 /* request bodies */
 const TallyRequestBody = {
   description: 'Required fields to post a video from tally',
@@ -286,6 +327,16 @@ const MediaconvertRequestBody = {
   content: {
     'application/json': {
       schema: MediaConvertSchema,
+    },
+  },
+};
+
+const StripeRequestBody = {
+  description: 'Required fields to patch a video from Stripe',
+  required: true,
+  content: {
+    'application/json': {
+      schema: StripeSchema,
     },
   },
 };
@@ -339,4 +390,28 @@ export class WebhookController {
     await this.clipRepository.updateById(id, clip);
   }
 
+  @post('/webhooks/stripe')
+  @response(204, {
+    description: 'Video PATCH success',
+  })
+  async patchFromStripe(
+    @requestBody(StripeRequestBody)
+    stripeBody: Stripe,
+  ): Promise<void> {
+    const reviewedById = 'google-oauth2|108696639446471583538';
+    const email = stripeBody.data.object.customer_details.email
+    const filter = {
+      where: {
+        email
+      }
+    }
+    const videos = await this.videoRepository.find(filter)
+    const pendingVideos = videos.filter(video => video.status === 'pending' && video.reviewedById !== reviewedById);
+    const id = pendingVideos[0].id
+
+    const video = {
+      reviewedById
+    };
+    return this.videoRepository.updateById(id, video);
+  }
 }
