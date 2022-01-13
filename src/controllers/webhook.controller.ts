@@ -95,6 +95,32 @@ type Stripe = {
   };
 };
 
+type S3Request = {
+  version: string;
+  id: string;
+  'detail-type': string;
+  source: string;
+  account: string;
+  time: string;
+  region: string;
+  detail: {
+    version: number;
+    bucket: {
+      name: string;
+    };
+    object: {
+      key: string;
+      size: number;
+      etag: string;
+      sequencer: string;
+    };
+    'request-id': string;
+    requester: string;
+    'source-ip-address': string;
+    reason: string;
+  }
+};
+
 
 /* JSON schemas */
 const TallySchema: SchemaObject = {
@@ -310,6 +336,25 @@ const StripeSchema: SchemaObject = {
   }
 };
 
+const S3Schema: SchemaObject = {
+  type: 'object',
+  properties: {
+    detail: {
+      type: 'object',
+      properties: {
+        object: {
+          type: 'object',
+          properties: {
+            key: {
+              type: 'string'
+            }
+          }
+        }
+      }
+    }
+  }
+};
+
 /* request bodies */
 const TallyRequestBody = {
   description: 'Required fields to post a video from tally',
@@ -337,6 +382,16 @@ const StripeRequestBody = {
   content: {
     'application/json': {
       schema: StripeSchema,
+    },
+  },
+};
+
+const S3RequestBody = {
+  description: 'Required fields to patch a clip from S3',
+  required: true,
+  content: {
+    'application/json': {
+      schema: S3Schema,
     },
   },
 };
@@ -413,5 +468,29 @@ export class WebhookController {
       reviewedById
     };
     return this.videoRepository.updateById(id, video);
+  }
+
+  @post('/webhooks/s3')
+  @response(204, {
+    description: 'Clip PATCH success',
+  })
+  async patchFromS3(
+    @requestBody(S3RequestBody)
+    s3Request: S3Request,
+  ): Promise<void> {
+    const key = s3Request.detail.object.key
+    if (!key.startsWith('clips-ai/')) {
+      return;
+    }
+
+    const file = key.split('clips-ai/')[1]
+    const id = +file.split('-')[0]
+    const analysisUrl = `https://flexin-video.s3.us-east-2.amazonaws.com/${key}`
+    const clip = {
+      analysisUrl
+    };
+
+    await this.clipRepository.updateById(id, clip);
+    return;
   }
 }
