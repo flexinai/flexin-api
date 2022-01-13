@@ -16,7 +16,7 @@ export class VideoUploadService {
     });
     const command = new PutObjectCommand({
       Bucket: 'flexin-video',
-      Key: fileName,
+      Key: `originals/${fileName}`,
       ContentType: 'application/octet-stream',
     });
     const url = getSignedUrl(client, command, { expiresIn: 300 });
@@ -28,13 +28,13 @@ export class VideoUploadService {
       return;
     }
 
-    const fileName = url.split('https://flexin-video.s3.us-east-2.amazonaws.com/')[1]
+    const filePath = url.split('https://flexin-video.s3.us-east-2.amazonaws.com/')[1]
     const client = new S3Client({
       region: process.env.AWS_DEFAULT_REGION,
     });
     const command = new DeleteObjectCommand({
       Bucket: 'flexin-video',
-      Key: fileName,
+      Key: filePath,
     });
     return client.send(command);
   }
@@ -95,7 +95,7 @@ export class VideoUploadService {
             OutputGroupSettings: {
               Type: "FILE_GROUP_SETTINGS",
               FileGroupSettings: {
-                Destination: "s3://flexin-video/"
+                Destination: "s3://flexin-video/clips/"
               }
             }
           }
