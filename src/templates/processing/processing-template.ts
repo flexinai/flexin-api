@@ -176,7 +176,7 @@ export const processingTemplate = () => {
                     <tbody>
                       <tr>
                         <td align="left" style="font-size:0px;padding:0px 25px 0px 25px;word-break:break-word;">
-                          <div style="font-family:Arial, sans-serif;font-size:16px;line-height:28px;text-align:left;color:#ffffff;">We can't thank you enough for using our handstand app. Your video has been submitted for review. This technology is still under development which may result in future changes to user experience. We appreciate any feedback you may have. Send us a comment at <a href="mailto:general@flexin.io" style="color: white">general@flexin.io</a>.</div>
+                          <div style="font-family:Arial, sans-serif;font-size:16px;line-height:28px;text-align:left;color:#ffffff;">We can't thank you enough for using our app. Your video has been submitted for review. This technology is still under development which may result in future changes to user experience. We appreciate any feedback you may have. Send us a comment at <a href="mailto:general@flexin.io" style="color: white">general@flexin.io</a>.</div>
                         </td>
                       </tr>
                       <tr>

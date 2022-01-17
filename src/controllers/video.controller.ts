@@ -217,7 +217,7 @@ export class VideoController {
 
   private sendProcessingEmail(emailAddress: string): Promise<any> {
     const email: EmailMessage = {
-      subject: 'flexin: processing your handstand now',
+      subject: 'flexin: processing your video now',
       html: processingTemplate(),
       to: [{email: emailAddress, type: 'to'}],
     };
@@ -226,7 +226,7 @@ export class VideoController {
 
   private sendVideoReviewedEmail(emailAddress: string, videoId: number): Promise<any> {
     const email: EmailMessage = {
-      subject: 'flexin: handstand review ready',
+      subject: 'flexin: video review ready',
       html: reviewedTemplate(videoId),
       to: [{email: emailAddress, type: 'to'}],
     };
