@@ -463,7 +463,8 @@ export class WebhookController {
     const videos = await this.videoRepository.find(filter)
     const validVideos = videos.filter(video => video.status === 'valid' && video.reviewedById !== reviewedById);
     const id = validVideos[0].id
-
+    console.log(email)
+    console.log(id)
     const video = {
       reviewedById
     };
