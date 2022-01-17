@@ -7,7 +7,7 @@ import {ManagementClient, User} from 'auth0';
 const management = new ManagementClient({
   clientId: 'ospPrIAuZWQqMOh3RYDeILRTQR5CSY3i',
   clientSecret: process.env.AUTH0_CLIENT_SECRET,
-  domain: 'dev-e-vh6xi2.us.auth0.com',
+  domain: 'auth.flexin.io',
 });
 
 export class UserController {

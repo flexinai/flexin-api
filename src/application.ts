@@ -33,9 +33,9 @@ export class FlexinApiApplication extends BootMixin(
      registerAuthenticationStrategy(this, JWTAuthenticationStrategy);
 
      this.configure(KEY).to({
-       jwksUri: 'https://dev-e-vh6xi2.us.auth0.com/.well-known/jwks.json',
+       jwksUri: 'https://auth.flexin.io/.well-known/jwks.json',
        audience: 'https://api.flexin.io',
-       issuer: 'https://dev-e-vh6xi2.us.auth0.com/',
+       issuer: 'https://auth.flexin.io/',
        algorithms: ['RS256']
      });
 
