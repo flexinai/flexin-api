@@ -1,4 +1,3 @@
-import {inject} from '@loopback/core';
 import {
   Count,
   CountSchema,
@@ -18,13 +17,10 @@ import {
 } from '@loopback/rest';
 import {Clip, Correction} from '../models';
 import {ClipRepository} from '../repositories';
-import {MixpanelService} from '../services';
 
 export class ClipCorrectionController {
   constructor(
     @repository(ClipRepository) protected clipRepository: ClipRepository,
-    @inject('services.MixpanelService')
-    protected mixpanelService: MixpanelService,
   ) {}
 
   @get('/clips/{id}/corrections', {
@@ -69,13 +65,6 @@ export class ClipCorrectionController {
     })
     correction: Omit<Correction, 'id'>,
   ): Promise<Correction> {
-    const clip = await this.clipRepository.findById(id, {include: [{relation: 'video'}]});
-    // log a mixpanel event
-    this.mixpanelService.trackEvent({
-      name: 'video annotated',
-      distinctId: clip.video.email || 'unknown',
-      additionalProperties: {videoId: clip.videoId},
-    });
     return this.clipRepository.corrections(id).create(correction);
   }
 

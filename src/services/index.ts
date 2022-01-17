@@ -5,7 +5,6 @@
 
 export * from './basic.authorizer.service';
 export * from './email.service';
-export * from './mixpanel.service';
 export * from './new-jwt.service';
 export * from './video.upload.service';
 

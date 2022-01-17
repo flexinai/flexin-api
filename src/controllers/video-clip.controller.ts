@@ -19,14 +19,10 @@ import {
   Clip, Video
 } from '../models';
 import {VideoRepository} from '../repositories';
-import {inject} from '@loopback/core';
-import {MixpanelEvent, MixpanelService} from '../services';
 
 export class VideoClipController {
   constructor(
     @repository(VideoRepository) protected videoRepository: VideoRepository,
-    @inject('services.MixpanelService')
-    protected mixpanelService: MixpanelService,
   ) {}
 
   @get('/videos/{id}/clips', {
@@ -71,15 +67,6 @@ export class VideoClipController {
     })
     clip: Omit<Clip, 'id'>,
   ): Promise<Clip> {
-    let video = await this.videoRepository.findById(id);
-    // log a mixpanel event
-    this.mixpanelService.trackEvent({
-      name: 'video clipped',
-      distinctId: video.email!,
-      additionalProperties: {
-        videoId: video.id,
-      },
-    });
     return this.videoRepository.clips(id).create(clip);
   }
 

@@ -71,7 +71,6 @@
     "jwks-rsa": "^2.0.5",
     "loopback-connector-postgresql": "^5.2.1",
     "loopback-connector-rest": "^3.7.0",
-    "mixpanel": "^0.13.0",
     "passport": "^0.4.1",
     "tslib": "^2.0.0"
   },
