@@ -14,7 +14,7 @@ import {
   response
 } from '@loopback/rest';
 import {Video} from '../models';
-import {VideoRepository} from '../repositories';
+import {ClipRepository, VideoRepository} from '../repositories';
 import {EmailMessage, EmailService, VideoUploadService} from '../services';
 import {processingTemplate, reviewedTemplate} from '../templates';
 
@@ -28,6 +28,8 @@ export class VideoController {
   constructor(
     @repository(VideoRepository)
     public videoRepository: VideoRepository,
+    @repository(ClipRepository)
+    public clipRepository: ClipRepository,
     @inject('services.VideoUploadService')
     protected videoUploadService: VideoUploadService,
     @inject('services.EmailService')
@@ -58,7 +60,14 @@ export class VideoController {
     } else {
       console.log(emailResponse);
     }
-    return this.videoRepository.create(video);
+    const finishedVideo = await this.videoRepository.create(video);
+    const finishedClip = await this.clipRepository.create({
+      startMilliseconds: 0,
+      endMilliseconds: finishedVideo.endMilliseconds,
+      videoId: finishedVideo.id
+    });
+    await this.videoUploadService.sendJob(finishedVideo, finishedClip);
+    return finishedVideo;
   }
 
   @get('/videos/count')
