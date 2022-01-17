@@ -147,7 +147,7 @@ export class VideoController {
     video: Video,
   ): Promise<void> {
     const currentVideo = await this.videoRepository.findById(id);
-    // if video status is changing from 'pending' to 'reviewed', send the 'video reviewed' email
+    // if video status is changing from 'valid' to 'reviewed', send the 'video reviewed' email
     if (currentVideo.status === 'valid' && video.status === 'reviewed') {
       const emailResponse = await this.sendVideoReviewedEmail(currentVideo.email, id);
       if (emailResponse[0] && emailResponse[0].status === 'sent') {
@@ -163,10 +163,13 @@ export class VideoController {
   @response(204, {
     description: 'Video PUT success',
   })
-  async replaceById(@param.path.number('id') id: number, @requestBody() video: Video): Promise<void> {
+  async replaceById(
+    @param.path.number('id') id: number,
+    @requestBody() video: Video
+  ): Promise<void> {
     const currentVideo = await this.videoRepository.findById(id);
-    // if video status is changing from pending to reviewed, send the "video reviewed" email
-    if (currentVideo.status === 'pending' && video.status === 'reviewed') {
+    // if video status is changing from valid to reviewed, send the "video reviewed" email
+    if (currentVideo.status === 'valid' && video.status === 'reviewed') {
       const emailResponse = await this.sendVideoReviewedEmail(video.email, id);
       if (emailResponse[0] && emailResponse[0].status === 'sent') {
         video.reviewedEmailSent = new Date();

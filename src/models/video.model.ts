@@ -31,7 +31,7 @@ export class Video extends Entity {
   // 'pending', 'valid', and 'invalid'. default to 'pending'
   @property({
     type: 'string',
-    default: 'pending',
+    default: 'valid',
   })
   status?: string;
 
