@@ -56,6 +56,12 @@ export class Video extends Entity {
   })
   reviewedById: string;
 
+  @property({
+    type: 'number',
+    required: true,
+  })
+  endMilliseconds: number;
+
   constructor(data?: Partial<Video>) {
     super(data);
   }
