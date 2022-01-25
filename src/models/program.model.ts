@@ -23,7 +23,8 @@ export class Program extends Entity {
 
   @property({
     type: 'number',
-    required: true,
+    required: false,
+    default: 0,
   })
   currentSubscriberCount: number;
 
