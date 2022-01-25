@@ -11,3 +11,4 @@ export * from './video.controller';
 export * from './webhook.controller';
 
 
+export * from './program.controller';

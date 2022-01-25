@@ -12,6 +12,7 @@ import path from 'path';
 import {JWTAuthenticationStrategy, KEY} from './authentication-strategies';
 import {MySequence} from './sequence';
 import {JWTServiceProvider} from './services';
+import {CrudRestComponent} from '@loopback/rest-crud';
 
 // ----------------------
 
@@ -61,5 +62,6 @@ export class FlexinApiApplication extends BootMixin(
         nested: true,
       },
     };
+    this.component(CrudRestComponent);
   }
 }

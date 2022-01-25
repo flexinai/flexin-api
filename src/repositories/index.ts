@@ -4,3 +4,4 @@ export * from './correction.repository';
 export * from './video.repository';
 
 
+export * from './program.repository';

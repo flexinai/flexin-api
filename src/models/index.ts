@@ -4,3 +4,4 @@ export * from './correction.model';
 export * from './video.model';
 
 
+export * from './program.model';
