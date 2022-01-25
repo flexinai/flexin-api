@@ -453,20 +453,8 @@ export class WebhookController {
     @requestBody(StripeRequestBody)
     stripeBody: Stripe,
   ): Promise<void> {
-    const reviewedById = 'google-oauth2|114420823783393015087';
-    const email = stripeBody.data.object.customer_details.email
-    const filter = {
-      where: {
-        email
-      }
-    }
-    const videos = await this.videoRepository.find(filter)
-    const validVideos = videos.filter(video => video.status === 'valid' && video.reviewedById !== reviewedById);
-    const id = validVideos[0].id
-    const video = {
-      reviewedById
-    };
-    return this.videoRepository.updateById(id, video);
+
+    return;
   }
 
   @post('/webhooks/s3')
