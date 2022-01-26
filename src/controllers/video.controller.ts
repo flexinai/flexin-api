@@ -190,7 +190,7 @@ export class VideoController {
     await this.videoRepository.deleteById(id);
   }
 
-  @get('/videos/upload-url', {
+  @get('/upload-url/videos', {
     responses: {
       '200': {
         description: 'Object containing a pre-signed URL for upload to S3',
@@ -210,10 +210,36 @@ export class VideoController {
       },
     },
   })
-  async uploadUrl() {
-    const url = await this.videoUploadService.getUploadUrl(generateFileName());
+  async uploadUrlVideos() {
+    const url = await this.videoUploadService.getUploadUrl(generateFileName(), 'originals');
     return { url };
   }
+
+  @get('/upload-url/posts', {
+    responses: {
+      '200': {
+        description: 'Object containing a pre-signed URL for upload to S3',
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              properties: {
+                url: {
+                  type: 'string',
+                  description: 'Pre-signed URL string',
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  })
+  async uploadUrlPosts() {
+    const url = await this.videoUploadService.getUploadUrl(generateFileName(), 'posts');
+    return { url };
+  }
+
 
   private sendProcessingEmail(emailAddress: string): Promise<any> {
     const email: EmailMessage = {

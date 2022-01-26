@@ -10,13 +10,13 @@ import {millisecondsToHHMMSSFF} from '../utils/milliseconds-to-hhmmssff';
 @injectable({scope: BindingScope.TRANSIENT})
 export class VideoUploadService {
 
-  getUploadUrl(fileName: string): Promise<string> {
+  getUploadUrl(fileName: string, path = 'originals'): Promise<string> {
     const client = new S3Client({
       region: process.env.AWS_DEFAULT_REGION,
     });
     const command = new PutObjectCommand({
       Bucket: 'flexin-video',
-      Key: `originals/${fileName}`,
+      Key: `${path}/${fileName}`,
       ContentType: 'application/octet-stream',
     });
     const url = getSignedUrl(client, command, { expiresIn: 300 });
