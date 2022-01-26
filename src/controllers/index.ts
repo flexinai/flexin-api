@@ -12,3 +12,4 @@ export * from './webhook.controller';
 
 
 export * from './program.controller';
+export * from './post.controller';

@@ -5,3 +5,4 @@ export * from './video.repository';
 
 
 export * from './program.repository';
+export * from './post.repository';

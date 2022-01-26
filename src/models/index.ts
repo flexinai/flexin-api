@@ -5,3 +5,4 @@ export * from './video.model';
 
 
 export * from './program.model';
+export * from './post.model';
