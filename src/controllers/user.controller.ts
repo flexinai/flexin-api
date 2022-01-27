@@ -1,4 +1,3 @@
-import {authenticate} from '@loopback/authentication';
 import {
   get, param
 } from '@loopback/rest';
@@ -11,7 +10,6 @@ const management = new ManagementClient({
 });
 
 export class UserController {
-  @authenticate({strategy: 'auth0-jwt', options: {scopes: ['read:users']}})
   @get('/users/coach', {
     responses: {
       '200': {
