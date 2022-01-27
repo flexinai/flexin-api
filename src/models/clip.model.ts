@@ -30,6 +30,12 @@ export class Clip extends Entity {
   analysisUrl?: string;
 
   @property({
+    type: 'string',
+    required: false,
+  })
+  aiWithAnglesUrl?: string;
+
+  @property({
     type: 'number',
     required: true,
   })

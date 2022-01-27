@@ -4,7 +4,7 @@ import {
   repository
 } from '@loopback/repository';
 import {post, requestBody, Response, response, RestBindings, SchemaObject} from '@loopback/rest';
-import {Video} from '../models';
+import {Clip, Video} from '../models';
 import {ClipRepository, VideoRepository} from '../repositories';
 
 
@@ -466,16 +466,28 @@ export class WebhookController {
     s3Request: S3Request,
   ): Promise<void> {
     const key = s3Request.detail.object.key
-    if (!key.startsWith('clips-ai/')) {
+    const KEYS = [
+      'clips-ai/',
+      'clips-ai-with-angles/'
+    ]
+    const matchingKey = KEYS.find(k => key.startsWith(k))
+    if (!matchingKey) {
       return;
     }
 
-    const file = key.split('clips-ai/')[1]
+    const file = key.split(matchingKey)[1]
     const id = +file.split('-')[0]
-    const analysisUrl = `https://flexin-video.s3.us-east-2.amazonaws.com/${key}`
-    const clip = {
-      analysisUrl
-    };
+    const url = `https://flexin-video.s3.us-east-2.amazonaws.com/${key}`;
+
+    const clip: Partial<Clip> = {};
+
+    if (matchingKey === KEYS[0]) {
+      clip.analysisUrl = url
+    }
+
+    if (matchingKey === KEYS[1]) {
+      clip.aiWithAnglesUrl = url
+    }
 
     await this.clipRepository.updateById(id, clip);
     return;
