@@ -19,7 +19,7 @@ export class Correction extends Entity {
   @property({
     type: 'number',
   })
-  clipId?: number;
+  videoId?: number;
 
   @property({
     type: 'string',

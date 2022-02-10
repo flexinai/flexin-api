@@ -12,6 +12,7 @@ import path from 'path';
 import {JWTAuthenticationStrategy, KEY} from './authentication-strategies';
 import {MySequence} from './sequence';
 import {JWTServiceProvider} from './services';
+require('dotenv').config()
 
 // ----------------------
 

@@ -14,9 +14,10 @@ import {
   response
 } from '@loopback/rest';
 import {Video} from '../models';
-import {ClipRepository, VideoRepository} from '../repositories';
+import {VideoRepository} from '../repositories';
 import {EmailMessage, EmailService, VideoUploadService} from '../services';
 import {processingTemplate, reviewedTemplate} from '../templates';
+import {STATUSES, VIDEOTYPES} from '../utils/enums';
 
 // generates a filename like '20211008T194252702Z.mp4'
 const generateFileName = () => {
@@ -28,8 +29,6 @@ export class VideoController {
   constructor(
     @repository(VideoRepository)
     public videoRepository: VideoRepository,
-    @repository(ClipRepository)
-    public clipRepository: ClipRepository,
     @inject('services.VideoUploadService')
     protected videoUploadService: VideoUploadService,
     @inject('services.EmailService')
@@ -54,19 +53,13 @@ export class VideoController {
     })
     video: Video,
   ): Promise<Video> {
-    const emailResponse = await this.sendProcessingEmail(video.email);
+    const emailResponse = await this.sendProcessingEmail(video.createdById);
     if (emailResponse[0] && emailResponse[0].status === 'sent') {
       video.processingEmailSent = new Date();
     } else {
       console.log(emailResponse);
     }
     const finishedVideo = await this.videoRepository.create(video);
-    const finishedClip = await this.clipRepository.create({
-      startMilliseconds: 0,
-      endMilliseconds: finishedVideo.endMilliseconds,
-      videoId: finishedVideo.id
-    });
-    await this.videoUploadService.sendJob(finishedVideo, finishedClip);
     return finishedVideo;
   }
 
@@ -149,7 +142,7 @@ export class VideoController {
     const currentVideo = await this.videoRepository.findById(id);
     // if video status is changing from 'valid' to 'reviewed', send the 'video reviewed' email
     if (currentVideo.status === 'valid' && video.status === 'reviewed') {
-      const emailResponse = await this.sendVideoReviewedEmail(currentVideo.email, id);
+      const emailResponse = await this.sendVideoReviewedEmail(currentVideo.createdById, id);
       if (emailResponse[0] && emailResponse[0].status === 'sent') {
         video.reviewedEmailSent = new Date();
       } else {
@@ -169,8 +162,8 @@ export class VideoController {
   ): Promise<void> {
     const currentVideo = await this.videoRepository.findById(id);
     // if video status is changing from valid to reviewed, send the "video reviewed" email
-    if (currentVideo.status === 'valid' && video.status === 'reviewed') {
-      const emailResponse = await this.sendVideoReviewedEmail(video.email, id);
+    if (currentVideo.status === STATUSES.VALID && video.status === STATUSES.REVIEWED) {
+      const emailResponse = await this.sendVideoReviewedEmail(video.createdById, id);
       if (emailResponse[0] && emailResponse[0].status === 'sent') {
         video.reviewedEmailSent = new Date();
       } else {
@@ -190,7 +183,7 @@ export class VideoController {
     await this.videoRepository.deleteById(id);
   }
 
-  @get('/upload-url/videos', {
+  @get('/upload-url/{videoType}', {
     responses: {
       '200': {
         description: 'Object containing a pre-signed URL for upload to S3',
@@ -210,33 +203,8 @@ export class VideoController {
       },
     },
   })
-  async uploadUrlVideos() {
-    const url = await this.videoUploadService.getUploadUrl(generateFileName(), 'originals');
-    return { url };
-  }
-
-  @get('/upload-url/posts', {
-    responses: {
-      '200': {
-        description: 'Object containing a pre-signed URL for upload to S3',
-        content: {
-          'application/json': {
-            schema: {
-              type: 'object',
-              properties: {
-                url: {
-                  type: 'string',
-                  description: 'Pre-signed URL string',
-                },
-              },
-            },
-          },
-        },
-      },
-    },
-  })
-  async uploadUrlPosts() {
-    const url = await this.videoUploadService.getUploadUrl(generateFileName(), 'posts');
+  async uploadUrl(@param.path.string('videoType') videoType: VIDEOTYPES) {
+    const url = await this.videoUploadService.getUploadUrl(generateFileName(), videoType);
     return { url };
   }
 

@@ -12,14 +12,12 @@ import {
   response
 } from '@loopback/rest';
 import {Correction} from '../models';
-import {ClipRepository, CorrectionRepository} from '../repositories';
+import {CorrectionRepository} from '../repositories';
 
 export class CorrectionController {
   constructor(
     @repository(CorrectionRepository)
     public correctionRepository: CorrectionRepository,
-    @repository(ClipRepository)
-    protected clipRepository: ClipRepository,
   ) {}
 
   @post('/corrections')

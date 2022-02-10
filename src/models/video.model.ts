@@ -1,8 +1,12 @@
 import {Entity, hasMany, model, property} from '@loopback/repository';
-import {Clip} from './clip.model';
+import {Correction, Overlay} from '.';
+import {STATUSES, VIDEOTYPES, VISIBILITIES} from '../utils/enums';
 
 @model()
 export class Video extends Entity {
+  /**
+   * required
+   */
   @property({
     type: 'number',
     id: true,
@@ -11,30 +15,66 @@ export class Video extends Entity {
   id?: number;
 
   @property({
+    type: 'date',
+    default: '$now',
+  })
+  postedAt?: string;
+
+  @property({
     type: 'string',
     required: true,
   })
   url: string;
 
   @property({
+    type: 'number',
+    required: true,
+  })
+  durationMs: number;
+
+  @property({
     type: 'string',
     required: false,
   })
-  analysisUrl?: string;
+  thumbnailUrl: string;
 
+  /**
+   * metadata
+   */
   @property({
     type: 'string',
     required: true,
+    jsonSchema: {
+      enum: Object.values(VIDEOTYPES),
+    },
   })
-  email: string;
+  type: string;
 
-  // 'pending', 'valid', and 'invalid'. default to 'pending'
   @property({
     type: 'string',
-    default: 'valid',
+    jsonSchema: {
+      enum: Object.values(VISIBILITIES),
+    },
+  })
+  visibility: string;
+
+  @property({
+    type: 'string',
+    default: STATUSES.VALID,
+    jsonSchema: {
+      enum: Object.values(STATUSES),
+    },
   })
   status?: string;
 
+  @property({
+    type: 'string',
+  })
+  description?: string;
+
+  /**
+   * emails
+   */
   @property({
     type: 'date',
     required: false,
@@ -47,9 +87,15 @@ export class Video extends Entity {
   })
   reviewedEmailSent: Date;
 
-  @hasMany(() => Clip)
-  clips: Clip[];
+  @property({
+    type: 'date',
+    required: false,
+  })
+  readyForCoachEmailSent: Date;
 
+  /**
+   * users
+   */
   @property({
     type: 'string',
     required: false,
@@ -57,10 +103,18 @@ export class Video extends Entity {
   reviewedById: string;
 
   @property({
-    type: 'number',
-    required: true,
+    type: 'string',
   })
-  endMilliseconds: number;
+  createdById: string;
+
+  /**
+   * relations
+   */
+  @hasMany(() => Overlay)
+  overlays: Overlay[];
+
+  @hasMany(() => Correction)
+  corrections: Correction[];
 
   constructor(data?: Partial<Video>) {
     super(data);
