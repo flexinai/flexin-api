@@ -72,7 +72,8 @@
     "loopback-connector-postgresql": "^5.2.1",
     "loopback-connector-rest": "^3.7.0",
     "passport": "^0.4.1",
-    "tslib": "^2.0.0"
+    "tslib": "^2.0.0",
+    "dotenv": "^8.6.0"
   },
   "devDependencies": {
     "@loopback/build": "^7.0.1",
@@ -81,7 +82,6 @@
     "@types/auth0": "^2.34.9",
     "@types/node": "^10.17.60",
     "@types/passport": "^1.0.4",
-    "dotenv": "^8.2.0",
     "eslint": "^7.29.0",
     "source-map-support": "^0.5.19",
     "typescript": "~4.3.4"

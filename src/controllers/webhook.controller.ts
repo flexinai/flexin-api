@@ -4,8 +4,9 @@ import {
   repository
 } from '@loopback/repository';
 import {post, requestBody, Response, response, RestBindings, SchemaObject} from '@loopback/rest';
-import {Clip, Video} from '../models';
-import {ClipRepository, VideoRepository} from '../repositories';
+import {Overlay, Video} from '../models';
+import {OverlayRepository, VideoRepository} from '../repositories';
+import {VIEWS} from '../utils/enums';
 
 
 /* object specifications */
@@ -47,7 +48,7 @@ type MediaConvert = {
     jobId: string;
     status: string;
     userMetadata: {
-      clip: string;
+      video: string;
     };
     outputGroupDetails: {
       outputDetails: {
@@ -264,7 +265,7 @@ const MediaConvertSchema: SchemaObject = {
         userMetadata: {
           type: 'object',
           properties: {
-            clip: {
+            video: {
               type: 'string'
             }
           }
@@ -367,7 +368,7 @@ const TallyRequestBody = {
 };
 
 const MediaconvertRequestBody = {
-  description: 'Required fields to patch a clip from AWS MediaConvert',
+  description: 'Required fields to post an Overlay from AWS MediaConvert',
   required: true,
   content: {
     'application/json': {
@@ -387,7 +388,7 @@ const StripeRequestBody = {
 };
 
 const S3RequestBody = {
-  description: 'Required fields to patch a clip from S3',
+  description: 'Required fields to post an Overlay from S3',
   required: true,
   content: {
     'application/json': {
@@ -403,8 +404,8 @@ export class WebhookController {
     protected responseService: Response,
     @repository(VideoRepository)
     public videoRepository: VideoRepository,
-    @repository(ClipRepository)
-    public clipRepository: ClipRepository,
+    @repository(OverlayRepository)
+    public overlayRepository: OverlayRepository,
   ) {}
 
   @post('/webhooks/tally')
@@ -417,11 +418,11 @@ export class WebhookController {
   ): Promise<unknown> {
     const fileUpload = tally.data.fields.find(field => field.type === 'FILE_UPLOAD')?.value as { url: string }[]
     const {url} = fileUpload[0]
-    const email = tally.data.fields.find(field => field.type === 'INPUT_EMAIL')?.value as string
+    const createdById = tally.data.fields.find(field => field.type === 'INPUT_EMAIL')?.value as string
     const reviewedById = tally.data.fields.find(field => field.type === 'INPUT_NUMBER')?.value as string
     const video: Partial<Video> = {
       url,
-      email,
+      createdById,
       reviewedById,
     }
     return this.videoRepository.create(video);
@@ -429,20 +430,22 @@ export class WebhookController {
 
   @post('/webhooks/mediaconvert')
   @response(204, {
-    description: 'Clip PATCH success',
+    description: 'Overlay POST success',
   })
   async patchFromMediaconvert(
     @requestBody(MediaconvertRequestBody)
     mediaConvert: MediaConvert,
   ): Promise<void> {
-    const id = +mediaConvert.detail.userMetadata.clip
+    const id = +mediaConvert.detail.userMetadata.video
     const s3Url: string = mediaConvert.detail.outputGroupDetails[0].outputDetails[0].outputFilePaths[0]
     const video = s3Url.split('s3://flexin-video/')[1]
     const url = `https://flexin-video.s3.us-east-2.amazonaws.com/${video}`
-    const clip = {
-      url
+    const overlay: Partial<Overlay> = {
+      url,
+      videoId: id,
+      view: VIEWS.ANGLES
     };
-    await this.clipRepository.updateById(id, clip);
+    await this.overlayRepository.create(overlay);
   }
 
   @post('/webhooks/stripe')
@@ -459,37 +462,36 @@ export class WebhookController {
 
   @post('/webhooks/s3')
   @response(204, {
-    description: 'Clip PATCH success',
+    description: 'Overlay POST success',
   })
   async patchFromS3(
     @requestBody(S3RequestBody)
     s3Request: S3Request,
   ): Promise<void> {
     const key = s3Request.detail.object.key
-    const KEYS = [
-      'clips-ai/',
-      'clips-ai-with-angles/'
-    ]
-    const matchingKey = KEYS.find(k => key.startsWith(k))
-    if (!matchingKey) {
+    const availableViews = Object.values(VIEWS)
+    const KEYS = availableViews.map(view => `views/${view}`);
+    const keyIndex = KEYS.findIndex(k => key.startsWith(k))
+    const matchingKey = KEYS[keyIndex];
+    if (keyIndex === -1) {
       return;
     }
 
     const file = key.split(matchingKey)[1]
-    const id = +file.split('-')[0]
+    const video = await this.videoRepository.findOne({
+      where: {
+        url: `https://flexin-video.s3.us-east-2.amazonaws.com/review${file}`
+      }
+    })
     const url = `https://flexin-video.s3.us-east-2.amazonaws.com/${key}`;
 
-    const clip: Partial<Clip> = {};
+    const overlay: Partial<Overlay> = {
+      url,
+      videoId: video?.id,
+      view: availableViews[keyIndex]
+    };
 
-    if (matchingKey === KEYS[0]) {
-      clip.analysisUrl = url
-    }
-
-    if (matchingKey === KEYS[1]) {
-      clip.aiWithAnglesUrl = url
-    }
-
-    await this.clipRepository.updateById(id, clip);
+    await this.overlayRepository.create(overlay);
     return;
   }
 }

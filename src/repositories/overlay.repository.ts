@@ -1,16 +1,16 @@
 import {inject} from '@loopback/core';
 import {DefaultCrudRepository} from '@loopback/repository';
 import {DbDataSource} from '../datasources';
-import {Post, PostRelations} from '../models';
+import {Overlay, OverlayRelations} from '../models';
 
-export class PostRepository extends DefaultCrudRepository<
-  Post,
-  typeof Post.prototype.id,
-  PostRelations
+export class OverlayRepository extends DefaultCrudRepository<
+  Overlay,
+  typeof Overlay.prototype.id,
+  OverlayRelations
 > {
   constructor(
     @inject('datasources.db') dataSource: DbDataSource,
   ) {
-    super(Post, dataSource);
+    super(Overlay, dataSource);
   }
 }
