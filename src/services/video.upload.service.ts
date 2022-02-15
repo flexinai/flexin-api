@@ -3,8 +3,6 @@ import {getSignedUrl} from '@aws-sdk/s3-request-presigner';
 import {BindingScope, injectable} from '@loopback/core';
 import {VIDEOTYPES} from '../utils/enums';
 
-
-
 @injectable({scope: BindingScope.TRANSIENT})
 export class VideoUploadService {
 
