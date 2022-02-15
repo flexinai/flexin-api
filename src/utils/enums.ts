@@ -22,6 +22,7 @@ export enum VIDEOTYPES {
   REVIEW = 'review',
   REPLY = 'reply',
   POST = 'post',
+  THUMBNAIL = 'thumbnail'
 }
 
 export enum PROGRAMTYPES {

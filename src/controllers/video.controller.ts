@@ -20,9 +20,9 @@ import {processingTemplate, reviewedTemplate} from '../templates';
 import {STATUSES, VIDEOTYPES} from '../utils/enums';
 
 // generates a filename like '20211008T194252702Z.mp4'
-const generateFileName = () => {
+const generateFileName = (extension = '.mp4') => {
   const d = new Date();
-  return d.toISOString().replace(/[:.-]/g, '') + '.mp4';
+  return d.toISOString().replace(/[:.-]/g, '') + extension;
 };
 
 export class VideoController {
@@ -204,7 +204,9 @@ export class VideoController {
     },
   })
   async uploadUrl(@param.path.string('videoType') videoType: VIDEOTYPES) {
-    const url = await this.videoUploadService.getUploadUrl(generateFileName(), videoType);
+    const isThumbnail = videoType === VIDEOTYPES.THUMBNAIL;
+    const fileName = isThumbnail ? generateFileName('.jpg') : generateFileName('.mp4');
+    const url = await this.videoUploadService.getUploadUrl(fileName, videoType);
     return { url };
   }
 
