@@ -1,4 +1,6 @@
-import {injectable, /* inject, */ BindingScope} from '@loopback/core';
+/* eslint-disable @typescript-eslint/naming-convention */
+import { /* inject, */ BindingScope, injectable} from '@loopback/core';
+require('dotenv').config()
 const mailchimp = require('@mailchimp/mailchimp_transactional')(process.env.MAILCHIMP_API_KEY);
 const FROM_EMAIL = 'general@flexin.io';
 
@@ -25,17 +27,7 @@ export class EmailService {
       },
     };
     const response = await mailchimp.messages.send(body);
-    // console.log(response);
     return response;
   }
 
-  async sendTemplate(templateName: string, toList: ToObject[]) {
-    const body = {
-      template_name: templateName,
-      template_content: [],
-      message: {to: toList},
-    };
-    const response = await mailchimp.messages.sendTemplate(body);
-    return response;
-  }
 }

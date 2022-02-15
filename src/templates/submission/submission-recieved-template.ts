@@ -177,7 +177,7 @@ export const submissionRecievedTemplate = (videoId: number) => {
                   <tbody>
                     <tr>
                       <td align="left" style="font-size:0px;padding:0px 25px 0px 25px;word-break:break-word;">
-                        <div style="font-family:Arial, sans-serif;font-size:16px;line-height:28px;text-align:left;color:#ffffff;">An athlete has submitted a video for you to review. Visit <a href="coach.flexin.io/videos/${videoId}" style="color: white">flexin</a> to review the submission. Send us a comment at <a href="mailto:general@flexin.io" style="color: white">general@flexin.io</a>.</div>
+                        <div style="font-family:Arial, sans-serif;font-size:16px;line-height:28px;text-align:left;color:#ffffff;">An athlete has submitted a video for you to review. Visit <a href="https://app.flexin.io/videos/${videoId}" style="color: white">flexin</a> to review the submission. Send us a comment at <a href="mailto:general@flexin.io" style="color: white">general@flexin.io</a>.</div>
                       </td>
                     </tr>
                     <tr>
