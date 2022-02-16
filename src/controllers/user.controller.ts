@@ -1,7 +1,9 @@
+import {inject} from '@loopback/core';
 import {
-  get, param
+  get, param, patch, requestBody
 } from '@loopback/rest';
 import {ManagementClient, User} from 'auth0';
+import {UserService} from '../services';
 
 const management = new ManagementClient({
   clientId: 'ospPrIAuZWQqMOh3RYDeILRTQR5CSY3i',
@@ -10,6 +12,12 @@ const management = new ManagementClient({
 });
 
 export class UserController {
+  constructor(
+    @inject('services.UserService')
+    protected userService: UserService,
+  ) {
+
+  }
   @get('/users/coach', {
     responses: {
       '200': {
@@ -62,5 +70,26 @@ export class UserController {
       .catch((err: unknown) => {
         console.error(err)
       });
+  }
+
+  @patch('/users/{id}', {
+    responses: {
+      '200': {
+        description: 'User model instance',
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+            },
+          },
+        },
+      },
+    },
+  })
+  async patchOne(
+    @param.path.string('id') id: string,
+    @requestBody() user: User
+  ): Promise<void | User> {
+    return this.userService.updateUser(id, user)
   }
 }

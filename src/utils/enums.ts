@@ -21,8 +21,16 @@ export enum VISIBILITIES {
 export enum VIDEOTYPES {
   REVIEW = 'review',
   REPLY = 'reply',
+  POST = 'post'
+}
+
+
+export enum UPLOADTYPES {
+  REVIEW = 'review',
+  REPLY = 'reply',
   POST = 'post',
-  THUMBNAIL = 'thumbnail'
+  THUMBNAIL = 'thumbnail',
+  PROFILE_PHOTO = 'profile-photo'
 }
 
 export enum PROGRAMTYPES {

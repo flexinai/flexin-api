@@ -17,7 +17,7 @@ import {Video} from '../models';
 import {VideoRepository} from '../repositories';
 import {EmailMessage, EmailService, UserService, VideoUploadService} from '../services';
 import {processingTemplate, reviewedTemplate, submissionRecievedTemplate} from '../templates';
-import {VIDEOTYPES} from '../utils/enums';
+import {UPLOADTYPES} from '../utils/enums';
 import {validateEmail} from '../utils/validate-email';
 
 // generates a filename like '20211008T194252702Z.mp4'
@@ -35,7 +35,7 @@ export class VideoController {
     @inject('services.EmailService')
     protected emailService: EmailService,
     @inject('services.UserService')
-    protected userSerive: UserService,
+    protected userService: UserService,
   ) {}
 
   @post('/videos')
@@ -187,7 +187,7 @@ export class VideoController {
     await this.videoRepository.deleteById(id);
   }
 
-  @get('/upload-url/{videoType}', {
+  @get('/upload-url/{uploadType}', {
     responses: {
       '200': {
         description: 'Object containing a pre-signed URL for upload to S3',
@@ -207,16 +207,16 @@ export class VideoController {
       },
     },
   })
-  async uploadUrl(@param.path.string('videoType') videoType: VIDEOTYPES) {
-    const isThumbnail = videoType === VIDEOTYPES.THUMBNAIL;
-    const fileName = isThumbnail ? generateFileName('.jpg') : generateFileName('.mp4');
-    const url = await this.videoUploadService.getUploadUrl(fileName, videoType);
+  async uploadUrl(@param.path.string('uploadType') uploadType: UPLOADTYPES) {
+    const isPhoto = uploadType === UPLOADTYPES.THUMBNAIL || UPLOADTYPES.PROFILE_PHOTO;
+    const fileName = isPhoto ? generateFileName('.jpg') : generateFileName('.mp4');
+    const url = await this.videoUploadService.getUploadUrl(fileName, uploadType);
     return { url };
   }
 
 
   private async sendProcessingEmail(userId: string): Promise<void> {
-    const email = validateEmail(userId) ? userId : await this.userSerive.getEmail(userId)
+    const email = validateEmail(userId) ? userId : await this.userService.getEmail(userId)
     const message: EmailMessage = {
       subject: 'flexin: processing your video now',
       html: processingTemplate(),
@@ -231,7 +231,7 @@ export class VideoController {
   }
 
   private async sendVideoReviewedEmail(userId: string, videoId: number): Promise<void> {
-    const email = validateEmail(userId) ? userId : await this.userSerive.getEmail(userId)
+    const email = validateEmail(userId) ? userId : await this.userService.getEmail(userId)
     const message: EmailMessage = {
       subject: 'flexin: video review ready',
       html: reviewedTemplate(videoId),
@@ -246,7 +246,7 @@ export class VideoController {
   }
 
   private async sendReadyForCoachEmail(userId: string, videoId: number): Promise<void> {
-    const email = validateEmail(userId) ? userId : await this.userSerive.getEmail(userId)
+    const email = validateEmail(userId) ? userId : await this.userService.getEmail(userId)
     const message: EmailMessage = {
       subject: 'flexin: new video for review',
       html: submissionRecievedTemplate(videoId),

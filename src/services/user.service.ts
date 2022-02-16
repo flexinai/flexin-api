@@ -1,5 +1,5 @@
 import { /* inject, */ BindingScope, injectable} from '@loopback/core';
-import {ManagementClient} from 'auth0';
+import {ManagementClient, User} from 'auth0';
 require('dotenv').config()
 
 const management = new ManagementClient({
@@ -25,5 +25,10 @@ export class UserService {
   async getUser(userId: string) {
     const user = await management.getUser({ id: userId })
     return user;
+  }
+
+  async updateUser(userId: string, user: Partial<User>) {
+
+    return management.updateUser({ id: userId }, user);
   }
 }
