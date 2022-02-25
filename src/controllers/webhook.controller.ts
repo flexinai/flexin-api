@@ -4,8 +4,8 @@ import {
   repository
 } from '@loopback/repository';
 import {post, requestBody, Response, response, RestBindings, SchemaObject} from '@loopback/rest';
-import {Overlay, Video} from '../models';
-import {OverlayRepository, VideoRepository} from '../repositories';
+import {Overlay, Review} from '../models';
+import {OverlayRepository, ReviewRepository} from '../repositories';
 import {VIEWS} from '../utils/enums';
 
 
@@ -48,7 +48,7 @@ type MediaConvert = {
     jobId: string;
     status: string;
     userMetadata: {
-      video: string;
+      review: string;
     };
     outputGroupDetails: {
       outputDetails: {
@@ -265,7 +265,7 @@ const MediaConvertSchema: SchemaObject = {
         userMetadata: {
           type: 'object',
           properties: {
-            video: {
+            review: {
               type: 'string'
             }
           }
@@ -358,7 +358,7 @@ const S3Schema: SchemaObject = {
 
 /* request bodies */
 const TallyRequestBody = {
-  description: 'Required fields to post a video from tally',
+  description: 'Required fields to post a review from tally',
   required: true,
   content: {
     'application/json': {
@@ -378,7 +378,7 @@ const MediaconvertRequestBody = {
 };
 
 const StripeRequestBody = {
-  description: 'Required fields to patch a video from Stripe',
+  description: 'Required fields to patch a review from Stripe',
   required: true,
   content: {
     'application/json': {
@@ -402,15 +402,15 @@ export class WebhookController {
   constructor(
     @inject(RestBindings.Http.RESPONSE)
     protected responseService: Response,
-    @repository(VideoRepository)
-    public videoRepository: VideoRepository,
+    @repository(ReviewRepository)
+    public reviewRepository: ReviewRepository,
     @repository(OverlayRepository)
     public overlayRepository: OverlayRepository,
   ) {}
 
   @post('/webhooks/tally')
   @response(204, {
-    description: 'Video PUT success',
+    description: 'Review PUT success',
   })
   async createVideoNew(
     @requestBody(TallyRequestBody)
@@ -420,12 +420,12 @@ export class WebhookController {
     const {url} = fileUpload[0]
     const createdById = tally.data.fields.find(field => field.type === 'INPUT_EMAIL')?.value as string
     const reviewedById = tally.data.fields.find(field => field.type === 'INPUT_NUMBER')?.value as string
-    const video: Partial<Video> = {
+    const review: Partial<Review> = {
       url,
       createdById,
       reviewedById,
     }
-    return this.videoRepository.create(video);
+    return this.reviewRepository.create(review);
   }
 
   @post('/webhooks/mediaconvert')
@@ -436,13 +436,13 @@ export class WebhookController {
     @requestBody(MediaconvertRequestBody)
     mediaConvert: MediaConvert,
   ): Promise<void> {
-    const id = +mediaConvert.detail.userMetadata.video
+    const id = +mediaConvert.detail.userMetadata.review
     const s3Url: string = mediaConvert.detail.outputGroupDetails[0].outputDetails[0].outputFilePaths[0]
-    const video = s3Url.split('s3://flexin-video/')[1]
-    const url = `https://flexin-video.s3.us-east-2.amazonaws.com/${video}`
+    const review = s3Url.split('s3://flexin-video/')[1]
+    const url = `https://flexin-video.s3.us-east-2.amazonaws.com/${review}`
     const overlay: Partial<Overlay> = {
       url,
-      videoId: id,
+      reviewId: id,
       view: VIEWS.ANGLES
     };
     await this.overlayRepository.create(overlay);
@@ -450,7 +450,7 @@ export class WebhookController {
 
   @post('/webhooks/stripe')
   @response(204, {
-    description: 'Video PATCH success',
+    description: 'Review PATCH success',
   })
   async patchFromStripe(
     @requestBody(StripeRequestBody)
@@ -478,7 +478,7 @@ export class WebhookController {
     }
 
     const file = key.split(matchingKey)[1]
-    const video = await this.videoRepository.findOne({
+    const review = await this.reviewRepository.findOne({
       where: {
         url: `https://flexin-video.s3.us-east-2.amazonaws.com/review${file}`
       }
@@ -487,7 +487,7 @@ export class WebhookController {
 
     const overlay: Partial<Overlay> = {
       url,
-      videoId: video?.id,
+      reviewId: review?.id,
       view: availableViews[keyIndex]
     };
 

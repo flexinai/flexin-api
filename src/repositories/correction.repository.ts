@@ -1,8 +1,8 @@
 import {Getter, inject} from '@loopback/core';
 import {BelongsToAccessor, DefaultCrudRepository, repository} from '@loopback/repository';
-import {VideoRepository} from '.';
+import {ReplyRepository} from '.';
 import {DbDataSource} from '../datasources';
-import {Correction, CorrectionNote, CorrectionRelations, Video} from '../models';
+import {Correction, CorrectionNote, CorrectionRelations, Reply} from '../models';
 import {CorrectionNoteRepository} from './correction-note.repository';
 
 export class CorrectionRepository extends DefaultCrudRepository<
@@ -12,17 +12,17 @@ export class CorrectionRepository extends DefaultCrudRepository<
 > {
 
   public readonly correctionNote: BelongsToAccessor<CorrectionNote, typeof Correction.prototype.id>;
-  public readonly reply: BelongsToAccessor<Video, typeof Video.prototype.id>;
+  public readonly reply: BelongsToAccessor<Reply, typeof Reply.prototype.id>;
 
   constructor(
     @inject('datasources.db') dataSource: DbDataSource,
     @repository.getter('CorrectionNoteRepository') protected correctionNoteRepositoryGetter: Getter<CorrectionNoteRepository>,
-    @repository.getter('VideoRepository') protected videoRepositoryGetter: Getter<VideoRepository>,
+    @repository.getter('ReplyRepository') protected replyRepositoryGetter: Getter<ReplyRepository>,
   ) {
     super(Correction, dataSource);
     this.correctionNote = this.createBelongsToAccessorFor('correctionNote', correctionNoteRepositoryGetter,);
     this.registerInclusionResolver('correctionNote', this.correctionNote.inclusionResolver);
-    this.reply = this.createBelongsToAccessorFor('reply', videoRepositoryGetter,);
+    this.reply = this.createBelongsToAccessorFor('reply', replyRepositoryGetter,);
     this.registerInclusionResolver('reply', this.reply.inclusionResolver);
   }
 }

@@ -1,9 +1,9 @@
 import {Entity, hasMany, model, property} from '@loopback/repository';
 import {Correction, Overlay} from '.';
-import {STATUSES, VIDEOTYPES, VISIBILITIES} from '../utils/enums';
+import {STATUSES, VISIBILITIES} from '../utils/enums';
 
 @model()
-export class Video extends Entity {
+export class Review extends Entity {
   /**
    * required
    */
@@ -43,15 +43,6 @@ export class Video extends Entity {
    */
   @property({
     type: 'string',
-    required: true,
-    jsonSchema: {
-      enum: Object.values(VIDEOTYPES),
-    },
-  })
-  type: string;
-
-  @property({
-    type: 'string',
     jsonSchema: {
       enum: Object.values(VISIBILITIES),
     },
@@ -66,11 +57,6 @@ export class Video extends Entity {
     },
   })
   status?: string;
-
-  @property({
-    type: 'string',
-  })
-  description?: string;
 
   /**
    * emails
@@ -113,16 +99,16 @@ export class Video extends Entity {
   @hasMany(() => Overlay)
   overlays: Overlay[];
 
-  @hasMany(() => Correction, {keyTo: 'reviewId'})
+  @hasMany(() => Correction)
   corrections: Correction[];
 
-  constructor(data?: Partial<Video>) {
+  constructor(data?: Partial<Review>) {
     super(data);
   }
 }
 
-export interface VideoRelations {
+export interface ReviewRelations {
   // describe navigational properties here
 }
 
-export type VideoWithRelations = Video & VideoRelations;
+export type ReviewWithRelations = Review & ReviewRelations;
