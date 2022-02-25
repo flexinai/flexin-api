@@ -35,7 +35,7 @@ export class Overlay extends Entity {
     type: 'number',
     required: true
   })
-  videoId: number;
+  reviewId: number;
 
   constructor(data?: Partial<Overlay>) {
     super(data);

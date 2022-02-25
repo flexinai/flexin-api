@@ -13,8 +13,8 @@ import {
   getModelSchemaRef, param, patch, post, put, requestBody,
   response
 } from '@loopback/rest';
-import {Video} from '../models';
-import {VideoRepository} from '../repositories';
+import {Review} from '../models';
+import {ReviewRepository} from '../repositories';
 import {EmailMessage, EmailService, UserService, VideoUploadService} from '../services';
 import {processingTemplate, reviewedTemplate, submissionRecievedTemplate} from '../templates';
 import {UPLOADTYPES} from '../utils/enums';
@@ -26,10 +26,10 @@ const generateFileName = (extension = '.mp4') => {
   return d.toISOString().replace(/[:.-]/g, '') + extension;
 };
 
-export class VideoController {
+export class ReviewController {
   constructor(
-    @repository(VideoRepository)
-    public videoRepository: VideoRepository,
+    @repository(ReviewRepository)
+    public reviewRepository: ReviewRepository,
     @inject('services.VideoUploadService')
     protected videoUploadService: VideoUploadService,
     @inject('services.EmailService')
@@ -38,153 +38,153 @@ export class VideoController {
     protected userService: UserService,
   ) {}
 
-  @post('/videos')
+  @post('/reviews')
   @response(200, {
-    description: 'Video model instance',
-    content: {'application/json': {schema: getModelSchemaRef(Video)}},
+    description: 'Review model instance',
+    content: {'application/json': {schema: getModelSchemaRef(Review)}},
   })
   async create(
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(Video, {
+          schema: getModelSchemaRef(Review, {
             title: 'NewVideo',
             // exclude: ['id'],
           }),
         },
       },
     })
-    video: Video,
-  ): Promise<Video> {
-    await this.sendProcessingEmail(video.createdById);
+    review: Review,
+  ): Promise<Review> {
+    await this.sendProcessingEmail(review.createdById);
 
-    return this.videoRepository.create(video);;
+    return this.reviewRepository.create(review);;
   }
 
-  @get('/videos/count')
+  @get('/reviews/count')
   @response(200, {
-    description: 'Video model count',
+    description: 'Review model count',
     content: {'application/json': {schema: CountSchema}},
   })
-  async count(@param.where(Video) where?: Where<Video>): Promise<Count> {
-    return this.videoRepository.count(where);
+  async count(@param.where(Review) where?: Where<Review>): Promise<Count> {
+    return this.reviewRepository.count(where);
   }
 
-  @authenticate({strategy: 'auth0-jwt', options: {scopes: ['read:videos']}})
-  @get('/videos')
+  @authenticate({strategy: 'auth0-jwt', options: {scopes: ['read:reviews']}})
+  @get('/reviews')
   @response(200, {
-    description: 'Array of Video model instances',
+    description: 'Array of Review model instances',
     content: {
       'application/json': {
         schema: {
           type: 'array',
-          items: getModelSchemaRef(Video, {includeRelations: true}),
+          items: getModelSchemaRef(Review, {includeRelations: true}),
         },
       },
     },
   })
-  async find(@param.filter(Video) filter?: Filter<Video>): Promise<Video[]> {
-    return this.videoRepository.find(filter);
+  async find(@param.filter(Review) filter?: Filter<Review>): Promise<Review[]> {
+    return this.reviewRepository.find(filter);
   }
 
-  @patch('/videos')
+  @patch('/reviews')
   @response(200, {
-    description: 'Video PATCH success count',
+    description: 'Review PATCH success count',
     content: {'application/json': {schema: CountSchema}},
   })
   async updateAll(
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(Video, {partial: true}),
+          schema: getModelSchemaRef(Review, {partial: true}),
         },
       },
     })
-    video: Video,
-    @param.where(Video) where?: Where<Video>,
+    review: Review,
+    @param.where(Review) where?: Where<Review>,
   ): Promise<Count> {
-    return this.videoRepository.updateAll(video, where);
+    return this.reviewRepository.updateAll(review, where);
   }
 
-  @get('/videos/{id}')
+  @get('/reviews/{id}')
   @response(200, {
-    description: 'Video model instance',
+    description: 'Review model instance',
     content: {
       'application/json': {
-        schema: getModelSchemaRef(Video, {includeRelations: true}),
+        schema: getModelSchemaRef(Review, {includeRelations: true}),
       },
     },
   })
   async findById(
     @param.path.number('id') id: number,
-    @param.filter(Video, {exclude: 'where'}) filter?: FilterExcludingWhere<Video>,
-  ): Promise<Video> {
-    return this.videoRepository.findById(id, filter);
+    @param.filter(Review, {exclude: 'where'}) filter?: FilterExcludingWhere<Review>,
+  ): Promise<Review> {
+    return this.reviewRepository.findById(id, filter);
   }
 
-  @patch('/videos/{id}')
+  @patch('/reviews/{id}')
   @response(204, {
-    description: 'Video PATCH success',
+    description: 'Review PATCH success',
   })
   async updateById(
     @param.path.number('id') id: number,
     @requestBody({
       content: {
         'application/json': {
-          schema: getModelSchemaRef(Video, {partial: true}),
+          schema: getModelSchemaRef(Review, {partial: true}),
         },
       },
     })
-    video: Video,
+    review: Review,
   ): Promise<void> {
-    const currentVideo = await this.videoRepository.findById(id);
-    const isVideoReviewed = currentVideo.status === 'valid' && video.status === 'reviewed'
-    const isVideoAssigned = !currentVideo.reviewedById && video.reviewedById
+    const currentVideo = await this.reviewRepository.findById(id);
+    const isVideoReviewed = currentVideo.status === 'valid' && review.status === 'reviewed'
+    const isVideoAssigned = !currentVideo.reviewedById && review.reviewedById
     if (isVideoReviewed) {
       await this.sendVideoReviewedEmail(currentVideo.createdById, id);
-      video.reviewedEmailSent = new Date();
+      review.reviewedEmailSent = new Date();
     }
 
     if (isVideoAssigned) {
-      await this.sendReadyForCoachEmail(video.reviewedById, id);
-      video.readyForCoachEmailSent = new Date();
+      await this.sendReadyForCoachEmail(review.reviewedById, id);
+      review.readyForCoachEmailSent = new Date();
     }
 
-    await this.videoRepository.updateById(id, video);
+    await this.reviewRepository.updateById(id, review);
   }
 
-  @put('/videos/{id}')
+  @put('/reviews/{id}')
   @response(204, {
-    description: 'Video PUT success',
+    description: 'Review PUT success',
   })
   async replaceById(
     @param.path.number('id') id: number,
-    @requestBody() video: Video
+    @requestBody() review: Review
   ): Promise<void> {
-    const currentVideo = await this.videoRepository.findById(id);
-    const isVideoReviewed = currentVideo.status === 'valid' && video.status === 'reviewed'
-    const isVideoAssigned = !currentVideo.reviewedById && video.reviewedById
+    const currentVideo = await this.reviewRepository.findById(id);
+    const isVideoReviewed = currentVideo.status === 'valid' && review.status === 'reviewed'
+    const isVideoAssigned = !currentVideo.reviewedById && review.reviewedById
     if (isVideoReviewed) {
       await this.sendVideoReviewedEmail(currentVideo.createdById, id);
-      video.reviewedEmailSent = new Date();
+      review.reviewedEmailSent = new Date();
     }
 
     if (isVideoAssigned) {
-      await this.sendReadyForCoachEmail(video.reviewedById, id);
-      video.readyForCoachEmailSent = new Date();
+      await this.sendReadyForCoachEmail(review.reviewedById, id);
+      review.readyForCoachEmailSent = new Date();
     }
 
-    await this.videoRepository.replaceById(id, video);
+    await this.reviewRepository.replaceById(id, review);
   }
 
-  @del('/videos/{id}')
+  @del('/reviews/{id}')
   @response(204, {
-    description: 'Video DELETE success',
+    description: 'Review DELETE success',
   })
   async deleteById(@param.path.number('id') id: number): Promise<void> {
-    const video = await this.videoRepository.findById(id);
-    await this.videoUploadService.deleteS3Video(video.url);
-    await this.videoRepository.deleteById(id);
+    const review = await this.reviewRepository.findById(id);
+    await this.videoUploadService.deleteS3Video(review.url);
+    await this.reviewRepository.deleteById(id);
   }
 
   @get('/upload-url/{uploadType}', {
@@ -218,7 +218,7 @@ export class VideoController {
   private async sendProcessingEmail(userId: string): Promise<void> {
     const email = validateEmail(userId) ? userId : await this.userService.getEmail(userId)
     const message: EmailMessage = {
-      subject: 'flexin: processing your video now',
+      subject: 'flexin: processing your review now',
       html: processingTemplate(),
       to: [{email, type: 'to'}]
     };
@@ -233,7 +233,7 @@ export class VideoController {
   private async sendVideoReviewedEmail(userId: string, videoId: number): Promise<void> {
     const email = validateEmail(userId) ? userId : await this.userService.getEmail(userId)
     const message: EmailMessage = {
-      subject: 'flexin: video review ready',
+      subject: 'flexin: review review ready',
       html: reviewedTemplate(videoId),
       to: [{email, type: 'to'}]
     };
@@ -248,7 +248,7 @@ export class VideoController {
   private async sendReadyForCoachEmail(userId: string, videoId: number): Promise<void> {
     const email = validateEmail(userId) ? userId : await this.userService.getEmail(userId)
     const message: EmailMessage = {
-      subject: 'flexin: new video for review',
+      subject: 'flexin: new review for review',
       html: submissionRecievedTemplate(videoId),
       to: [{email, type: 'to'}]
     };

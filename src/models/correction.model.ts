@@ -1,5 +1,5 @@
 import {belongsTo, Entity, model, property} from '@loopback/repository';
-import {Video} from '.';
+import {Reply} from '.';
 import {CorrectionNote} from './correction-note.model';
 
 @model()
@@ -49,7 +49,7 @@ export class Correction extends Entity {
   })
   reviewId?: number;
 
-  @belongsTo(() => Video)
+  @belongsTo(() => Reply)
   replyId: number;
 
   @belongsTo(() => CorrectionNote)
