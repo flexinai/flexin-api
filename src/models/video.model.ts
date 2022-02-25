@@ -113,7 +113,7 @@ export class Video extends Entity {
   @hasMany(() => Overlay)
   overlays: Overlay[];
 
-  @hasMany(() => Correction)
+  @hasMany(() => Correction, {keyTo: 'reviewId'})
   corrections: Correction[];
 
   constructor(data?: Partial<Video>) {

@@ -1,8 +1,12 @@
 import {belongsTo, Entity, model, property} from '@loopback/repository';
+import {Video} from '.';
 import {CorrectionNote} from './correction-note.model';
 
 @model()
 export class Correction extends Entity {
+  /**
+   * required
+   */
   @property({
     type: 'number',
     id: true,
@@ -16,19 +20,17 @@ export class Correction extends Entity {
   })
   timestamp: number;
 
-  @property({
-    type: 'number',
-  })
-  videoId?: number;
-
+  /**
+   * metadata
+   */
   @property({
     type: 'string',
   })
   comment?: string;
 
-  @belongsTo(() => CorrectionNote)
-  correctionNoteId: number;
-
+  /**
+   * users
+   */
   @property({
     type: 'string',
   })
@@ -39,11 +41,19 @@ export class Correction extends Entity {
   })
   assignedToId?: number;
 
+  /**
+   * relations
+   */
   @property({
-    type: 'string',
-    required: false,
+    type: 'number',
   })
-  videoCorrectionUrl?: string;
+  reviewId?: number;
+
+  @belongsTo(() => Video)
+  replyId: number;
+
+  @belongsTo(() => CorrectionNote)
+  correctionNoteId: number;
 
   constructor(data?: Partial<Correction>) {
     super(data);
