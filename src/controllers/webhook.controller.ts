@@ -5,8 +5,10 @@ import {
 } from '@loopback/repository';
 import {post, requestBody, Response, response, RestBindings, SchemaObject} from '@loopback/rest';
 import {Overlay, Review} from '../models';
-import {OverlayRepository, ReviewRepository} from '../repositories';
-import {VIEWS} from '../utils/enums';
+import {OverlayRepository, PostRepository, ReplyRepository, ReviewRepository} from '../repositories';
+import {VideoUploadService} from '../services';
+import {S3_URL} from '../utils/constsants';
+import {UPLOADTYPES, VIEWS} from '../utils/enums';
 
 
 /* object specifications */
@@ -48,7 +50,8 @@ type MediaConvert = {
     jobId: string;
     status: string;
     userMetadata: {
-      review: string;
+      type: string;
+      id: string;
     };
     outputGroupDetails: {
       outputDetails: {
@@ -265,7 +268,10 @@ const MediaConvertSchema: SchemaObject = {
         userMetadata: {
           type: 'object',
           properties: {
-            review: {
+            type: {
+              type: 'string'
+            },
+            id: {
               type: 'string'
             }
           }
@@ -404,8 +410,14 @@ export class WebhookController {
     protected responseService: Response,
     @repository(ReviewRepository)
     public reviewRepository: ReviewRepository,
+    @repository(PostRepository)
+    public postRepository: PostRepository,
+    @repository(ReplyRepository)
+    public replyRepository: ReplyRepository,
     @repository(OverlayRepository)
     public overlayRepository: OverlayRepository,
+    @inject('services.VideoUploadService')
+    protected videoUploadService: VideoUploadService,
   ) {}
 
   @post('/webhooks/tally/checkout')
@@ -472,16 +484,43 @@ export class WebhookController {
     @requestBody(MediaconvertRequestBody)
     mediaConvert: MediaConvert,
   ): Promise<void> {
-    const id = +mediaConvert.detail.userMetadata.review
-    const s3Url: string = mediaConvert.detail.outputGroupDetails[0].outputDetails[0].outputFilePaths[0]
-    const review = s3Url.split('s3://flexin-video/')[1]
-    const url = `https://flexin-video.s3.us-east-2.amazonaws.com/${review}`
-    const overlay: Partial<Overlay> = {
-      url,
-      reviewId: id,
-      view: VIEWS.ANGLES
-    };
-    await this.overlayRepository.create(overlay);
+    /**
+     * parse data
+     */
+    const type = mediaConvert.detail.userMetadata.type;
+    const id = +mediaConvert.detail.userMetadata.id;
+    const s3Url: string = mediaConvert.detail.outputGroupDetails[0].outputDetails[0].outputFilePaths[0];
+    const location = s3Url.split('s3://flexin-video/')[1];
+
+    /**
+     * delete input
+     */
+    const inputUrl = `${S3_URL}/input/${location}`;
+    await this.videoUploadService.deleteS3Video(inputUrl);
+
+    /**
+     * update the entity with the finished url
+     */
+    const url = `${S3_URL}/${location}`
+    switch (type) {
+      case UPLOADTYPES.POST:
+        await this.postRepository.updateById(id, {
+          url
+        });
+        return;
+      case UPLOADTYPES.REVIEW:
+        await this.reviewRepository.updateById(id, {
+          url
+        });
+        return;
+      case UPLOADTYPES.REPLY:
+        await this.replyRepository.updateById(id, {
+          url
+        });
+        return;
+      default:
+        return;
+    }
   }
 
   @post('/webhooks/stripe')

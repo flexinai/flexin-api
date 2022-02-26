@@ -1,29 +1,28 @@
+import {inject} from '@loopback/core';
 import {
   Count,
   CountSchema,
   Filter,
   FilterExcludingWhere,
   repository,
-  Where,
+  Where
 } from '@loopback/repository';
 import {
-  post,
-  param,
-  get,
-  getModelSchemaRef,
-  patch,
-  put,
-  del,
-  requestBody,
-  response,
+  del, get,
+  getModelSchemaRef, param, patch, post, put, requestBody,
+  response
 } from '@loopback/rest';
 import {Post} from '../models';
 import {PostRepository} from '../repositories';
+import {VideoUploadService} from '../services';
+import {UPLOADTYPES} from '../utils/enums';
 
 export class PostController {
   constructor(
     @repository(PostRepository)
     public postRepository : PostRepository,
+    @inject('services.VideoUploadService')
+    protected videoUploadService: VideoUploadService,
   ) {}
 
   @post('/posts')
@@ -42,9 +41,11 @@ export class PostController {
         },
       },
     })
-    post: Omit<Post, 'id'>,
+    postEntity: Omit<Post, 'id'>,
   ): Promise<Post> {
-    return this.postRepository.create(post);
+    const finishedPost = await this.postRepository.create(postEntity);
+    await this.videoUploadService.sendJob(finishedPost, UPLOADTYPES.POST);
+    return finishedPost;
   }
 
   @get('/posts/count')
@@ -89,10 +90,10 @@ export class PostController {
         },
       },
     })
-    post: Post,
+    postEntity: Post,
     @param.where(Post) where?: Where<Post>,
   ): Promise<Count> {
-    return this.postRepository.updateAll(post, where);
+    return this.postRepository.updateAll(postEntity, where);
   }
 
   @get('/posts/{id}')
@@ -124,9 +125,9 @@ export class PostController {
         },
       },
     })
-    post: Post,
+    postEntity: Post,
   ): Promise<void> {
-    await this.postRepository.updateById(id, post);
+    await this.postRepository.updateById(id, postEntity);
   }
 
   @put('/posts/{id}')
@@ -135,9 +136,9 @@ export class PostController {
   })
   async replaceById(
     @param.path.number('id') id: number,
-    @requestBody() post: Post,
+    @requestBody() postEntity: Post,
   ): Promise<void> {
-    await this.postRepository.replaceById(id, post);
+    await this.postRepository.replaceById(id, postEntity);
   }
 
   @del('/posts/{id}')

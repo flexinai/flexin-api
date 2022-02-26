@@ -58,7 +58,10 @@ export class ReviewController {
   ): Promise<Review> {
     await this.sendProcessingEmail(review.createdById);
 
-    return this.reviewRepository.create(review);;
+
+    const finishedReview = await this.reviewRepository.create(review);
+    await this.videoUploadService.sendJob(finishedReview, UPLOADTYPES.REVIEW);
+    return finishedReview;
   }
 
   @get('/reviews/count')
