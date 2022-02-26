@@ -408,7 +408,7 @@ export class WebhookController {
     public overlayRepository: OverlayRepository,
   ) {}
 
-  @post('/webhooks/tally')
+  @post('/webhooks/tally/checkout')
   @response(204, {
     description: 'Review PUT success',
   })
@@ -416,15 +416,51 @@ export class WebhookController {
     @requestBody(TallyRequestBody)
     tally: Tally,
   ): Promise<unknown> {
-    const fileUpload = tally.data.fields.find(field => field.type === 'FILE_UPLOAD')?.value as { url: string }[]
-    const {url} = fileUpload[0]
+    /**
+     * check if email has been used
+     */
     const createdById = tally.data.fields.find(field => field.type === 'INPUT_EMAIL')?.value as string
+
+    const videoWithEmail = await this.reviewRepository.findOne({
+      where: {
+        createdById
+      }
+    })
+    const emailHasBeenUsed = videoWithEmail ? true : false;
+
+    /**
+     * check if payment
+     */
+    if (emailHasBeenUsed) {
+      return;
+    }
+
+
+    /**
+     * either return or proceed to upload
+     */
+
+    /**
+     * check if multiple videos or single video
+     */
+    /**
+     * upload the file to flexin-videos
+     */
+     const fileUpload = tally.data.fields.find(field => field.type === 'FILE_UPLOAD')?.value as { url: string }[]
+     const {url} = fileUpload[0]
+
+    /**
+     * create the review
+     */
     const reviewedById = tally.data.fields.find(field => field.type === 'INPUT_NUMBER')?.value as string
     const review: Partial<Review> = {
       url,
       createdById,
       reviewedById,
     }
+    /**
+     * send coach the email
+     */
     return this.reviewRepository.create(review);
   }
 
