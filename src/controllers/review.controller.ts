@@ -211,7 +211,7 @@ export class ReviewController {
     },
   })
   async uploadUrl(@param.path.string('uploadType') uploadType: UPLOADTYPES) {
-    const isPhoto = uploadType === UPLOADTYPES.THUMBNAIL || UPLOADTYPES.PROFILE_PHOTO;
+    const isPhoto = uploadType === UPLOADTYPES.THUMBNAIL || uploadType === UPLOADTYPES.PROFILE_PHOTO;
     const fileName = isPhoto ? generateFileName('.jpg') : generateFileName('.mp4');
     const url = await this.videoUploadService.getUploadUrl(fileName, uploadType);
     return { url };
