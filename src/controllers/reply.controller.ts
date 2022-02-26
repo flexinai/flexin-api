@@ -1,29 +1,28 @@
+import {inject} from '@loopback/core';
 import {
   Count,
   CountSchema,
   Filter,
   FilterExcludingWhere,
   repository,
-  Where,
+  Where
 } from '@loopback/repository';
 import {
-  post,
-  param,
-  get,
-  getModelSchemaRef,
-  patch,
-  put,
-  del,
-  requestBody,
-  response,
+  del, get,
+  getModelSchemaRef, param, patch, post, put, requestBody,
+  response
 } from '@loopback/rest';
 import {Reply} from '../models';
 import {ReplyRepository} from '../repositories';
+import {VideoUploadService} from '../services';
+import {UPLOADTYPES} from '../utils/enums';
 
 export class ReplyController {
   constructor(
     @repository(ReplyRepository)
     public replyRepository : ReplyRepository,
+    @inject('services.VideoUploadService')
+    protected videoUploadService: VideoUploadService,
   ) {}
 
   @post('/replies')
@@ -44,7 +43,9 @@ export class ReplyController {
     })
     reply: Omit<Reply, 'id'>,
   ): Promise<Reply> {
-    return this.replyRepository.create(reply);
+    const finishedReply = await this.replyRepository.create(reply);
+    await this.videoUploadService.sendJob(finishedReply, UPLOADTYPES.REPLY);
+    return finishedReply;
   }
 
   @get('/replies/count')
