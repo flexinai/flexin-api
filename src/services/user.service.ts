@@ -12,16 +12,6 @@ const management = new ManagementClient({
 export class UserService {
   constructor(/* Add @inject to inject parameters */) {}
 
-  async getEmail(userId: string) {
-    const user = await management.getUser({ id: userId })
-
-    if (user.email) {
-      return user.email;
-    }
-
-    throw Error('no user found');
-  }
-
   async getUser(userId: string) {
     const user = await management.getUser({ id: userId })
     return user;

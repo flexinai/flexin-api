@@ -15,10 +15,8 @@ import {
 } from '@loopback/rest';
 import {Review} from '../models';
 import {ReviewRepository} from '../repositories';
-import {EmailMessage, EmailService, UserService, VideoUploadService} from '../services';
-import {processingTemplate, reviewedTemplate, submissionRecievedTemplate} from '../templates';
+import {UserService, VideoUploadService} from '../services';
 import {UPLOADTYPES} from '../utils/enums';
-import {validateEmail} from '../utils/validate-email';
 
 // generates a filename like '20211008T194252702Z.mp4'
 const generateFileName = (extension = '.mp4') => {
@@ -32,8 +30,6 @@ export class ReviewController {
     public reviewRepository: ReviewRepository,
     @inject('services.VideoUploadService')
     protected videoUploadService: VideoUploadService,
-    @inject('services.EmailService')
-    protected emailService: EmailService,
     @inject('services.UserService')
     protected userService: UserService,
   ) {}
@@ -56,9 +52,6 @@ export class ReviewController {
     })
     review: Review,
   ): Promise<Review> {
-    await this.sendProcessingEmail(review.createdById);
-
-
     const finishedReview = await this.reviewRepository.create(review);
     await this.videoUploadService.sendJob(finishedReview, UPLOADTYPES.REVIEW);
     return finishedReview;
@@ -140,19 +133,6 @@ export class ReviewController {
     })
     review: Review,
   ): Promise<void> {
-    const currentVideo = await this.reviewRepository.findById(id);
-    const isVideoReviewed = currentVideo.status === 'valid' && review.status === 'reviewed'
-    const isVideoAssigned = !currentVideo.reviewedById && review.reviewedById
-    if (isVideoReviewed) {
-      await this.sendVideoReviewedEmail(currentVideo.createdById, id);
-      review.reviewedEmailSent = new Date();
-    }
-
-    if (isVideoAssigned) {
-      await this.sendReadyForCoachEmail(review.reviewedById, id);
-      review.readyForCoachEmailSent = new Date();
-    }
-
     await this.reviewRepository.updateById(id, review);
   }
 
@@ -164,19 +144,6 @@ export class ReviewController {
     @param.path.number('id') id: number,
     @requestBody() review: Review
   ): Promise<void> {
-    const currentVideo = await this.reviewRepository.findById(id);
-    const isVideoReviewed = currentVideo.status === 'valid' && review.status === 'reviewed'
-    const isVideoAssigned = !currentVideo.reviewedById && review.reviewedById
-    if (isVideoReviewed) {
-      await this.sendVideoReviewedEmail(currentVideo.createdById, id);
-      review.reviewedEmailSent = new Date();
-    }
-
-    if (isVideoAssigned) {
-      await this.sendReadyForCoachEmail(review.reviewedById, id);
-      review.readyForCoachEmailSent = new Date();
-    }
-
     await this.reviewRepository.replaceById(id, review);
   }
 
@@ -215,51 +182,5 @@ export class ReviewController {
     const fileName = isPhoto ? generateFileName('.jpg') : generateFileName('.mp4');
     const url = await this.videoUploadService.getUploadUrl(fileName, uploadType);
     return { url };
-  }
-
-
-  private async sendProcessingEmail(userId: string): Promise<void> {
-    const email = validateEmail(userId) ? userId : await this.userService.getEmail(userId)
-    const message: EmailMessage = {
-      subject: 'flexin: processing your review now',
-      html: processingTemplate(),
-      to: [{email, type: 'to'}]
-    };
-    const emailResponse = await this.emailService.send(message);
-    if (emailResponse[0]?.status === 'sent') {
-      return;
-    }
-
-    throw emailResponse[0];
-  }
-
-  private async sendVideoReviewedEmail(userId: string, videoId: number): Promise<void> {
-    const email = validateEmail(userId) ? userId : await this.userService.getEmail(userId)
-    const message: EmailMessage = {
-      subject: 'flexin: review review ready',
-      html: reviewedTemplate(videoId),
-      to: [{email, type: 'to'}]
-    };
-    const emailResponse = await this.emailService.send(message);
-    if (emailResponse[0]?.status === 'sent') {
-      return;
-    }
-
-    throw emailResponse[0];
-  }
-
-  private async sendReadyForCoachEmail(userId: string, videoId: number): Promise<void> {
-    const email = validateEmail(userId) ? userId : await this.userService.getEmail(userId)
-    const message: EmailMessage = {
-      subject: 'flexin: new review for review',
-      html: submissionRecievedTemplate(videoId),
-      to: [{email, type: 'to'}]
-    };
-    const emailResponse = await this.emailService.send(message);
-    if (emailResponse[0]?.status === 'sent') {
-      return;
-    }
-
-    throw emailResponse[0];
   }
 }
