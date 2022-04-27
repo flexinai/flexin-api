@@ -58,26 +58,6 @@ export class Review extends Entity {
   })
   status?: string;
 
-  /**
-   * emails
-   */
-  @property({
-    type: 'date',
-    required: false,
-  })
-  processingEmailSent: Date;
-
-  @property({
-    type: 'date',
-    required: false,
-  })
-  reviewedEmailSent: Date;
-
-  @property({
-    type: 'date',
-    required: false,
-  })
-  readyForCoachEmailSent: Date;
 
   /**
    * users
