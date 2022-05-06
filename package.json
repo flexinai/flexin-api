@@ -66,14 +66,15 @@
     "auth0": "^2.37.0",
     "aws-sdk": "^2.1041.0",
     "axios": "^0.21.1",
+    "cloudconvert": "^2.3.0",
+    "dotenv": "^8.6.0",
     "express-jwt": "^6.1.0",
     "express-jwt-authz": "^2.4.1",
     "jwks-rsa": "^2.0.5",
     "loopback-connector-postgresql": "^5.2.1",
     "loopback-connector-rest": "^3.7.0",
     "passport": "^0.4.1",
-    "tslib": "^2.0.0",
-    "dotenv": "^8.6.0"
+    "tslib": "^2.0.0"
   },
   "devDependencies": {
     "@loopback/build": "^7.0.1",

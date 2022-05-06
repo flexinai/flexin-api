@@ -1,7 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/naming-convention */
 import {CreateJobCommand, MediaConvertClient} from '@aws-sdk/client-mediaconvert';
 import {DeleteObjectCommand, PutObjectCommand, S3Client} from '@aws-sdk/client-s3';
 import {getSignedUrl} from '@aws-sdk/s3-request-presigner';
 import {BindingScope, injectable} from '@loopback/core';
+import CloudConvert from 'cloudconvert';
 import {Post, Reply, Review} from '../models';
 import {S3_URL} from '../utils/constsants';
 import {UPLOADTYPES} from '../utils/enums';
@@ -125,5 +128,37 @@ export class VideoUploadService {
     await client.send(command);
 
     return video;
+  }
+
+  async getDownloadUrl(url: string) {
+    const cloudConvert = new CloudConvert(process.env.CLOUDCONVERT_API_KEY as string);
+    const signedUrlBase = 'https://s.cloudconvert.com/ff5dbc63-2576-4852-a631-7408aac99928'; // You can find it in your signed URL settings.
+    const signingSecret = '8PuResvOMf2HA0Cy0QD8lJqzgfDU84Oq'; // You can find it in your signed URL settings.
+    const cacheKey = 'cache-key'; // Allows caching of the result file for 24h
+    const job = {
+        tasks: {
+            'import-it': {
+                operation: 'import/url',
+                url
+            },
+            'convert-my-file': {
+                operation: 'convert',
+                input: 'import-it',
+                'output_format': 'mp4'
+            },
+            'export-it': {
+                operation: 'export/url',
+                input: 'convert-my-file',
+                inline: true
+            }
+        }
+    } as any;
+
+    return cloudConvert.signedUrls.sign(
+      signedUrlBase,
+      signingSecret,
+      job,
+      cacheKey
+    );
   }
 }
