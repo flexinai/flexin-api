@@ -186,7 +186,7 @@ export class ReviewController {
     return { url };
   }
 
-  @get('/download-overlay-url/{overlayId}', {
+  @post('/download-overlay-url', {
     responses: {
       '200': {
         description: 'Object containing a pre-signed URL for upload to S3',
@@ -206,11 +206,11 @@ export class ReviewController {
       },
     },
   })
-  async downloadUrl(@param.path.number('overlayId') overlayId: number) {
-    const overlay = await this.overlayRepository.findById(overlayId);
-    const url = await this.videoUploadService.getDownloadUrl(overlay.url);
+  async downloadUrl(
+    @requestBody()
+    body: { url: string },
+  ) {
+    const url = await this.videoUploadService.getDownloadUrl(body.url);
     return { url };
   }
-
-
 }
