@@ -14,7 +14,7 @@ import {
   response
 } from '@loopback/rest';
 import {Review} from '../models';
-import {ReviewRepository} from '../repositories';
+import {OverlayRepository, ReviewRepository} from '../repositories';
 import {UserService, VideoUploadService} from '../services';
 import {UPLOADTYPES} from '../utils/enums';
 
@@ -28,6 +28,8 @@ export class ReviewController {
   constructor(
     @repository(ReviewRepository)
     public reviewRepository: ReviewRepository,
+    @repository(OverlayRepository)
+    public overlayRepository: OverlayRepository,
     @inject('services.VideoUploadService')
     protected videoUploadService: VideoUploadService,
     @inject('services.UserService')
@@ -183,4 +185,32 @@ export class ReviewController {
     const url = await this.videoUploadService.getUploadUrl(fileName, uploadType);
     return { url };
   }
+
+  @get('/download-overlay-url/{overlayId}', {
+    responses: {
+      '200': {
+        description: 'Object containing a pre-signed URL for upload to S3',
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              properties: {
+                url: {
+                  type: 'string',
+                  description: 'Pre-signed URL string',
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  })
+  async downloadUrl(@param.path.number('overlayId') overlayId: number) {
+    const overlay = await this.overlayRepository.findById(overlayId);
+    const url = await this.videoUploadService.getDownloadUrl(overlay.url);
+    return { url };
+  }
+
+
 }
