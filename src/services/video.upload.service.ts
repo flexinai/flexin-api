@@ -134,7 +134,7 @@ export class VideoUploadService {
     const cloudConvert = new CloudConvert(process.env.CLOUDCONVERT_API_KEY as string);
     const signedUrlBase = 'https://s.cloudconvert.com/ff5dbc63-2576-4852-a631-7408aac99928'; // You can find it in your signed URL settings.
     const signingSecret = '8PuResvOMf2HA0Cy0QD8lJqzgfDU84Oq'; // You can find it in your signed URL settings.
-    const cacheKey = 'cache-key'; // Allows caching of the result file for 24h
+
     const job = {
         tasks: {
             'import-it': {
@@ -158,7 +158,7 @@ export class VideoUploadService {
       signedUrlBase,
       signingSecret,
       job,
-      cacheKey
+      null
     );
   }
 }
