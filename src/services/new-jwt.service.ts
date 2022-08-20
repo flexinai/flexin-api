@@ -1,10 +1,4 @@
-import {
-  bind,
-  BindingScope,
-  config,
-  ContextTags,
-  Provider
-} from '@loopback/core';
+import {bind, BindingScope, config, ContextTags, Provider} from '@loopback/core';
 import jwt, {RequestHandler} from 'express-jwt';
 import {Auth0Config, JWT_SERVICE, KEY} from '../authentication-strategies/types';
 
@@ -32,11 +26,8 @@ export class JWTServiceProvider implements Provider<RequestHandler> {
       algorithms: auth0Config.algorithms || ['RS256'],
       // Customize `getToken` to allow `access_token` query string in addition
       // to `Authorization` header
-      getToken: (req) => {
-        if (
-          req.headers.authorization &&
-          req.headers.authorization.split(' ')[0] === 'Bearer'
-        ) {
+      getToken: req => {
+        if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
           return req.headers.authorization.split(' ')[1];
         } else if (req.query?.access_token) {
           return req.query.access_token;

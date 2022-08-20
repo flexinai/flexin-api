@@ -1,18 +1,7 @@
 import {authenticate} from '@loopback/authentication';
 import {inject} from '@loopback/core';
-import {
-  Count,
-  CountSchema,
-  Filter,
-  FilterExcludingWhere,
-  repository,
-  Where
-} from '@loopback/repository';
-import {
-  del, get,
-  getModelSchemaRef, param, patch, post, put, requestBody,
-  response
-} from '@loopback/rest';
+import {Count, CountSchema, Filter, FilterExcludingWhere, repository, Where} from '@loopback/repository';
+import {del, get, getModelSchemaRef, param, patch, post, put, requestBody, response} from '@loopback/rest';
 import {Review} from '../models';
 import {ReviewRepository} from '../repositories';
 import {UserService, VideoUploadService} from '../services';
@@ -83,6 +72,22 @@ export class ReviewController {
     return this.reviewRepository.find(filter);
   }
 
+  @get('/mobile/reviews')
+  @response(200, {
+    description: 'Array of Review model instances',
+    content: {
+      'application/json': {
+        schema: {
+          type: 'array',
+          items: getModelSchemaRef(Review, {includeRelations: true}),
+        },
+      },
+    },
+  })
+  async findMobile(@param.filter(Review) filter?: Filter<Review>): Promise<Review[]> {
+    return this.reviewRepository.find(filter);
+  }
+
   @patch('/reviews')
   @response(200, {
     description: 'Review PATCH success count',
@@ -140,10 +145,7 @@ export class ReviewController {
   @response(204, {
     description: 'Review PUT success',
   })
-  async replaceById(
-    @param.path.number('id') id: number,
-    @requestBody() review: Review
-  ): Promise<void> {
+  async replaceById(@param.path.number('id') id: number, @requestBody() review: Review): Promise<void> {
     await this.reviewRepository.replaceById(id, review);
   }
 
@@ -181,6 +183,6 @@ export class ReviewController {
     const isPhoto = uploadType === UPLOADTYPES.THUMBNAIL || uploadType === UPLOADTYPES.PROFILE_PHOTO;
     const fileName = isPhoto ? generateFileName('.jpg') : generateFileName('.mp4');
     const url = await this.videoUploadService.getUploadUrl(fileName, uploadType);
-    return { url };
+    return {url};
   }
 }

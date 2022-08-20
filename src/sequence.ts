@@ -7,7 +7,7 @@ import {
   AuthenticateFn,
   AuthenticationBindings,
   AUTHENTICATION_STRATEGY_NOT_FOUND,
-  USER_PROFILE_NOT_FOUND
+  USER_PROFILE_NOT_FOUND,
 } from '@loopback/authentication';
 import {inject} from '@loopback/core';
 import {
@@ -19,7 +19,7 @@ import {
   RequestContext,
   RestBindings,
   Send,
-  SequenceHandler
+  SequenceHandler,
 } from '@loopback/rest';
 
 const SequenceActions = RestBindings.SequenceActions;
@@ -70,24 +70,15 @@ export class MySequence implements SequenceHandler {
       /**
        * Authentication errors for login page are handled by the express app
        */
-      if (
-        context.request.path === '/login' &&
-        (error.status === 401 || error.name === 'UnauthorizedError')
-      ) {
+      if (context.request.path === '/login' && (error.status === 401 || error.name === 'UnauthorizedError')) {
         /**
          * The express app that routed the /signup call to LB App, will handle the error event.
          */
-        context.response.emit(
-          'UnauthorizedError',
-          'User Authentication Failed',
-        );
+        context.response.emit('UnauthorizedError', 'User Authentication Failed');
         return;
       }
 
-      if (
-        error.code === AUTHENTICATION_STRATEGY_NOT_FOUND ||
-        error.code === USER_PROFILE_NOT_FOUND
-      ) {
+      if (error.code === AUTHENTICATION_STRATEGY_NOT_FOUND || error.code === USER_PROFILE_NOT_FOUND) {
         Object.assign(error, {statusCode: 401 /* Unauthorized */});
       }
       this.reject(context, error);

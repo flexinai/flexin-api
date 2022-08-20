@@ -1,11 +1,9 @@
-
 import {AuthenticationBindings, AuthenticationMetadata, AuthenticationStrategy} from '@loopback/authentication';
 import {inject} from '@loopback/core';
 import {ExpressRequestHandler, Request, Response, RestBindings} from '@loopback/rest';
 import {UserProfile} from '@loopback/security';
 import {JWT_SERVICE} from './types';
 const jwtAuthz = require('express-jwt-authz');
-
 
 export class JWTAuthenticationStrategy implements AuthenticationStrategy {
   name = 'auth0-jwt';
@@ -17,11 +15,9 @@ export class JWTAuthenticationStrategy implements AuthenticationStrategy {
     private metadata: AuthenticationMetadata[],
     @inject(JWT_SERVICE)
     private jwtCheck: ExpressRequestHandler,
-  ) {
-  }
+  ) {}
 
   async authenticate(request: Request): Promise<UserProfile | undefined> {
-
     return new Promise<UserProfile | undefined>((resolve, reject) => {
       this.jwtCheck(request, this.response, (err: unknown) => {
         if (err) {

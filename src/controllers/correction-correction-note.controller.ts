@@ -1,21 +1,13 @@
-import {
-  repository
-} from '@loopback/repository';
-import {
-  get,
-  getModelSchemaRef, param
-} from '@loopback/rest';
-import {
-  Correction,
-  CorrectionNote
-} from '../models';
+import {repository} from '@loopback/repository';
+import {get, getModelSchemaRef, param} from '@loopback/rest';
+import {Correction, CorrectionNote} from '../models';
 import {CorrectionRepository} from '../repositories';
 
 export class CorrectionCorrectionNoteController {
   constructor(
     @repository(CorrectionRepository)
     public correctionRepository: CorrectionRepository,
-  ) { }
+  ) {}
 
   @get('/corrections/{id}/correction-note', {
     responses: {
@@ -29,9 +21,7 @@ export class CorrectionCorrectionNoteController {
       },
     },
   })
-  async getCorrectionNote(
-    @param.path.number('id') id: typeof Correction.prototype.id,
-  ): Promise<CorrectionNote> {
+  async getCorrectionNote(@param.path.number('id') id: typeof Correction.prototype.id): Promise<CorrectionNote> {
     return this.correctionRepository.correctionNote(id);
   }
 }

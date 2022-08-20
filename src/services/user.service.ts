@@ -1,6 +1,6 @@
-import { /* inject, */ BindingScope, injectable} from '@loopback/core';
+import {/* inject, */ BindingScope, injectable} from '@loopback/core';
 import {ManagementClient, User} from 'auth0';
-require('dotenv').config()
+require('dotenv').config();
 
 const management = new ManagementClient({
   clientId: 'ospPrIAuZWQqMOh3RYDeILRTQR5CSY3i',
@@ -13,12 +13,11 @@ export class UserService {
   constructor(/* Add @inject to inject parameters */) {}
 
   async getUser(userId: string) {
-    const user = await management.getUser({ id: userId })
+    const user = await management.getUser({id: userId});
     return user;
   }
 
   async updateUser(userId: string, user: Partial<User>) {
-
-    return management.updateUser({ id: userId }, user);
+    return management.updateUser({id: userId}, user);
   }
 }

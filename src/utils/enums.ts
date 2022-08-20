@@ -21,16 +21,15 @@ export enum VISIBILITIES {
 export enum VIDEOTYPES {
   REVIEW = 'review',
   REPLY = 'reply',
-  POST = 'post'
+  POST = 'post',
 }
-
 
 export enum UPLOADTYPES {
   REVIEW = 'review',
   REPLY = 'reply',
   POST = 'post',
   THUMBNAIL = 'thumbnail',
-  PROFILE_PHOTO = 'profile-photo'
+  PROFILE_PHOTO = 'profile-photo',
 }
 
 export enum PROGRAMTYPES {
@@ -41,9 +40,8 @@ export enum PROGRAMTYPES {
 }
 
 export enum VIEWS {
-  FRAME = 'frame',
-  ANGLES = 'all-angles',
-  LEFTANGLES = 'left-side-angles',
-  RIGHTANGLES = 'right-side-angles',
+  CENTER = 'center',
+  LEFT = 'left',
+  RIGHT = 'right',
   SAIYAN = 'saiyan',
 }

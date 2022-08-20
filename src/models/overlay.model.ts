@@ -23,8 +23,8 @@ export class Overlay extends Entity {
     type: 'string',
     required: true,
     jsonSchema: {
-      enum: Object.values(VIEWS)
-    }
+      enum: Object.values(VIEWS),
+    },
   })
   view: string;
 
@@ -33,7 +33,7 @@ export class Overlay extends Entity {
    */
   @property({
     type: 'number',
-    required: true
+    required: true,
   })
   reviewId: number;
 

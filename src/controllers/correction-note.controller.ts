@@ -1,23 +1,12 @@
-import {
-  Count,
-  CountSchema,
-  Filter,
-  FilterExcludingWhere,
-  repository,
-  Where
-} from '@loopback/repository';
-import {
-  del, get,
-  getModelSchemaRef, param, patch, post, put, requestBody,
-  response
-} from '@loopback/rest';
+import {Count, CountSchema, Filter, FilterExcludingWhere, repository, Where} from '@loopback/repository';
+import {del, get, getModelSchemaRef, param, patch, post, put, requestBody, response} from '@loopback/rest';
 import {CorrectionNote} from '../models';
 import {CorrectionNoteRepository} from '../repositories';
 
 export class CorrectionNoteController {
   constructor(
     @repository(CorrectionNoteRepository)
-    public correctionNoteRepository : CorrectionNoteRepository,
+    public correctionNoteRepository: CorrectionNoteRepository,
   ) {}
 
   @post('/correction-notes')
@@ -46,9 +35,7 @@ export class CorrectionNoteController {
     description: 'CorrectionNote model count',
     content: {'application/json': {schema: CountSchema}},
   })
-  async count(
-    @param.where(CorrectionNote) where?: Where<CorrectionNote>,
-  ): Promise<Count> {
+  async count(@param.where(CorrectionNote) where?: Where<CorrectionNote>): Promise<Count> {
     return this.correctionNoteRepository.count(where);
   }
 
@@ -64,9 +51,7 @@ export class CorrectionNoteController {
       },
     },
   })
-  async find(
-    @param.filter(CorrectionNote) filter?: Filter<CorrectionNote>,
-  ): Promise<CorrectionNote[]> {
+  async find(@param.filter(CorrectionNote) filter?: Filter<CorrectionNote>): Promise<CorrectionNote[]> {
     return this.correctionNoteRepository.find(filter);
   }
 
@@ -100,7 +85,7 @@ export class CorrectionNoteController {
   })
   async findById(
     @param.path.number('id') id: number,
-    @param.filter(CorrectionNote, {exclude: 'where'}) filter?: FilterExcludingWhere<CorrectionNote>
+    @param.filter(CorrectionNote, {exclude: 'where'}) filter?: FilterExcludingWhere<CorrectionNote>,
   ): Promise<CorrectionNote> {
     return this.correctionNoteRepository.findById(id, filter);
   }
@@ -127,10 +112,7 @@ export class CorrectionNoteController {
   @response(204, {
     description: 'CorrectionNote PUT success',
   })
-  async replaceById(
-    @param.path.number('id') id: number,
-    @requestBody() correctionNote: CorrectionNote,
-  ): Promise<void> {
+  async replaceById(@param.path.number('id') id: number, @requestBody() correctionNote: CorrectionNote): Promise<void> {
     await this.correctionNoteRepository.replaceById(id, correctionNote);
   }
 

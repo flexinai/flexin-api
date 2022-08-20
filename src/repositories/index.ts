@@ -5,5 +5,3 @@ export * from './post.repository';
 export * from './program.repository';
 export * from './reply.repository';
 export * from './review.repository';
-
-

@@ -1,17 +1,6 @@
 import {inject} from '@loopback/core';
-import {
-  Count,
-  CountSchema,
-  Filter,
-  FilterExcludingWhere,
-  repository,
-  Where
-} from '@loopback/repository';
-import {
-  del, get,
-  getModelSchemaRef, param, patch, post, put, requestBody,
-  response
-} from '@loopback/rest';
+import {Count, CountSchema, Filter, FilterExcludingWhere, repository, Where} from '@loopback/repository';
+import {del, get, getModelSchemaRef, param, patch, post, put, requestBody, response} from '@loopback/rest';
 import {Reply} from '../models';
 import {ReplyRepository} from '../repositories';
 import {VideoUploadService} from '../services';
@@ -20,7 +9,7 @@ import {UPLOADTYPES} from '../utils/enums';
 export class ReplyController {
   constructor(
     @repository(ReplyRepository)
-    public replyRepository : ReplyRepository,
+    public replyRepository: ReplyRepository,
     @inject('services.VideoUploadService')
     protected videoUploadService: VideoUploadService,
   ) {}
@@ -53,9 +42,7 @@ export class ReplyController {
     description: 'Reply model count',
     content: {'application/json': {schema: CountSchema}},
   })
-  async count(
-    @param.where(Reply) where?: Where<Reply>,
-  ): Promise<Count> {
+  async count(@param.where(Reply) where?: Where<Reply>): Promise<Count> {
     return this.replyRepository.count(where);
   }
 
@@ -71,9 +58,7 @@ export class ReplyController {
       },
     },
   })
-  async find(
-    @param.filter(Reply) filter?: Filter<Reply>,
-  ): Promise<Reply[]> {
+  async find(@param.filter(Reply) filter?: Filter<Reply>): Promise<Reply[]> {
     return this.replyRepository.find(filter);
   }
 
@@ -107,7 +92,7 @@ export class ReplyController {
   })
   async findById(
     @param.path.number('id') id: number,
-    @param.filter(Reply, {exclude: 'where'}) filter?: FilterExcludingWhere<Reply>
+    @param.filter(Reply, {exclude: 'where'}) filter?: FilterExcludingWhere<Reply>,
   ): Promise<Reply> {
     return this.replyRepository.findById(id, filter);
   }
@@ -134,10 +119,7 @@ export class ReplyController {
   @response(204, {
     description: 'Reply PUT success',
   })
-  async replaceById(
-    @param.path.number('id') id: number,
-    @requestBody() reply: Reply,
-  ): Promise<void> {
+  async replaceById(@param.path.number('id') id: number, @requestBody() reply: Reply): Promise<void> {
     await this.replyRepository.replaceById(id, reply);
   }
 
