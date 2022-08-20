@@ -43,5 +43,6 @@ export enum VIEWS {
   CENTER = 'center',
   LEFT = 'left',
   RIGHT = 'right',
+  CALCULATE = 'calculate',
   SAIYAN = 'saiyan',
 }
