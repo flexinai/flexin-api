@@ -1,17 +1,6 @@
 import {inject} from '@loopback/core';
-import {
-  Count,
-  CountSchema,
-  Filter,
-  FilterExcludingWhere,
-  repository,
-  Where
-} from '@loopback/repository';
-import {
-  del, get,
-  getModelSchemaRef, param, patch, post, put, requestBody,
-  response
-} from '@loopback/rest';
+import {Count, CountSchema, Filter, FilterExcludingWhere, repository, Where} from '@loopback/repository';
+import {del, get, getModelSchemaRef, param, patch, post, put, requestBody, response} from '@loopback/rest';
 import {Post} from '../models';
 import {PostRepository} from '../repositories';
 import {VideoUploadService} from '../services';
@@ -20,7 +9,7 @@ import {UPLOADTYPES} from '../utils/enums';
 export class PostController {
   constructor(
     @repository(PostRepository)
-    public postRepository : PostRepository,
+    public postRepository: PostRepository,
     @inject('services.VideoUploadService')
     protected videoUploadService: VideoUploadService,
   ) {}
@@ -53,9 +42,7 @@ export class PostController {
     description: 'Post model count',
     content: {'application/json': {schema: CountSchema}},
   })
-  async count(
-    @param.where(Post) where?: Where<Post>,
-  ): Promise<Count> {
+  async count(@param.where(Post) where?: Where<Post>): Promise<Count> {
     return this.postRepository.count(where);
   }
 
@@ -71,9 +58,7 @@ export class PostController {
       },
     },
   })
-  async find(
-    @param.filter(Post) filter?: Filter<Post>,
-  ): Promise<Post[]> {
+  async find(@param.filter(Post) filter?: Filter<Post>): Promise<Post[]> {
     return this.postRepository.find(filter);
   }
 
@@ -107,7 +92,7 @@ export class PostController {
   })
   async findById(
     @param.path.number('id') id: number,
-    @param.filter(Post, {exclude: 'where'}) filter?: FilterExcludingWhere<Post>
+    @param.filter(Post, {exclude: 'where'}) filter?: FilterExcludingWhere<Post>,
   ): Promise<Post> {
     return this.postRepository.findById(id, filter);
   }
@@ -134,10 +119,7 @@ export class PostController {
   @response(204, {
     description: 'Post PUT success',
   })
-  async replaceById(
-    @param.path.number('id') id: number,
-    @requestBody() postEntity: Post,
-  ): Promise<void> {
+  async replaceById(@param.path.number('id') id: number, @requestBody() postEntity: Post): Promise<void> {
     await this.postRepository.replaceById(id, postEntity);
   }
 

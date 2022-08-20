@@ -1,29 +1,12 @@
-import {
-  Count,
-  CountSchema,
-  Filter,
-  FilterExcludingWhere,
-  repository,
-  Where,
-} from '@loopback/repository';
-import {
-  post,
-  param,
-  get,
-  getModelSchemaRef,
-  patch,
-  put,
-  del,
-  requestBody,
-  response,
-} from '@loopback/rest';
+import {Count, CountSchema, Filter, FilterExcludingWhere, repository, Where} from '@loopback/repository';
+import {del, get, getModelSchemaRef, param, patch, post, put, requestBody, response} from '@loopback/rest';
 import {Program} from '../models';
 import {ProgramRepository} from '../repositories';
 
 export class ProgramController {
   constructor(
     @repository(ProgramRepository)
-    public programRepository : ProgramRepository,
+    public programRepository: ProgramRepository,
   ) {}
 
   @post('/programs')
@@ -52,9 +35,7 @@ export class ProgramController {
     description: 'Program model count',
     content: {'application/json': {schema: CountSchema}},
   })
-  async count(
-    @param.where(Program) where?: Where<Program>,
-  ): Promise<Count> {
+  async count(@param.where(Program) where?: Where<Program>): Promise<Count> {
     return this.programRepository.count(where);
   }
 
@@ -70,9 +51,7 @@ export class ProgramController {
       },
     },
   })
-  async find(
-    @param.filter(Program) filter?: Filter<Program>,
-  ): Promise<Program[]> {
+  async find(@param.filter(Program) filter?: Filter<Program>): Promise<Program[]> {
     return this.programRepository.find(filter);
   }
 
@@ -106,7 +85,7 @@ export class ProgramController {
   })
   async findById(
     @param.path.number('id') id: number,
-    @param.filter(Program, {exclude: 'where'}) filter?: FilterExcludingWhere<Program>
+    @param.filter(Program, {exclude: 'where'}) filter?: FilterExcludingWhere<Program>,
   ): Promise<Program> {
     return this.programRepository.findById(id, filter);
   }
@@ -133,10 +112,7 @@ export class ProgramController {
   @response(204, {
     description: 'Program PUT success',
   })
-  async replaceById(
-    @param.path.number('id') id: number,
-    @requestBody() program: Program,
-  ): Promise<void> {
+  async replaceById(@param.path.number('id') id: number, @requestBody() program: Program): Promise<void> {
     await this.programRepository.replaceById(id, program);
   }
 

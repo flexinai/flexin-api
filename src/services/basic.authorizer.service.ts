@@ -52,7 +52,6 @@ export async function roleMatch(
 
   // console.log("User does not have an allowedRole: DENY");
   return AuthorizationDecision.DENY;
-
 }
 
 export async function roleAndIdMatch(
@@ -108,7 +107,7 @@ export async function roleAndIdMatch(
    */
   // console.log('Checking {userId} parameter: ', authorizationCtx.invocationContext.args[0]);
   // console.log('current user has securityId: ', currentUser[securityId]);
-  if (currentUser[securityId] == authorizationCtx.invocationContext.args[0]) {
+  if (currentUser[securityId] === authorizationCtx.invocationContext.args[0]) {
     // console.log("User ID matches: ALLOW");
     return AuthorizationDecision.ALLOW;
   }

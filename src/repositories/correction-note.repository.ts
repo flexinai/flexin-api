@@ -8,9 +8,7 @@ export class CorrectionNoteRepository extends DefaultCrudRepository<
   typeof CorrectionNote.prototype.id,
   CorrectionNoteRelations
 > {
-  constructor(
-    @inject('datasources.db') dataSource: DbDataSource,
-  ) {
+  constructor(@inject('datasources.db') dataSource: DbDataSource) {
     super(CorrectionNote, dataSource);
   }
 }

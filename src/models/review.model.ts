@@ -58,7 +58,6 @@ export class Review extends Entity {
   })
   status?: string;
 
-
   /**
    * users
    */

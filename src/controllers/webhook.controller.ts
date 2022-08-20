@@ -1,15 +1,12 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import {inject} from '@loopback/core';
-import {
-  repository
-} from '@loopback/repository';
+import {repository} from '@loopback/repository';
 import {post, requestBody, Response, response, RestBindings, SchemaObject} from '@loopback/rest';
 import {Overlay, Review} from '../models';
 import {OverlayRepository, PostRepository, ReplyRepository, ReviewRepository} from '../repositories';
 import {VideoUploadService} from '../services';
 import {S3_URL} from '../utils/constsants';
 import {UPLOADTYPES, VIEWS} from '../utils/enums';
-
 
 /* object specifications */
 type Tally = {
@@ -27,10 +24,13 @@ type Tally = {
       key: string;
       label: string;
       type: string;
-      value?: number | string | {
-        url: string;
-      }[];
-    }[]
+      value?:
+        | number
+        | string
+        | {
+            url: string;
+          }[];
+    }[];
   };
 };
 
@@ -60,11 +60,11 @@ type MediaConvert = {
         videoDetails: {
           widthInPx: number;
           heightInPx: number;
-        }
+        };
       }[];
       type: string;
-    }[]
-  }
+    }[];
+  };
   data: {
     responseId: string;
     submissionId: string;
@@ -76,25 +76,28 @@ type MediaConvert = {
       key: string;
       label: string;
       type: string;
-      value?: number | string | {
-        url: string;
-      }[];
-    }[]
+      value?:
+        | number
+        | string
+        | {
+            url: string;
+          }[];
+    }[];
   };
 };
 
 type Stripe = {
   data: {
     object: {
-       billing_details: {
-         email: string;
-       };
-       metadata: {
-         reviewedById: string;
-       };
-       customer_details: {
-         email: string;
-       };
+      billing_details: {
+        email: string;
+      };
+      metadata: {
+        reviewedById: string;
+      };
+      customer_details: {
+        email: string;
+      };
     };
   };
 };
@@ -122,43 +125,42 @@ type S3Request = {
     requester: string;
     'source-ip-address': string;
     reason: string;
-  }
+  };
 };
-
 
 /* JSON schemas */
 const TallySchema: SchemaObject = {
   type: 'object',
   properties: {
     eventId: {
-      type: 'string'
+      type: 'string',
     },
     eventType: {
-      type: 'string'
+      type: 'string',
     },
     createdAt: {
-      type: 'string'
+      type: 'string',
     },
     data: {
       type: 'object',
       properties: {
         responseId: {
-          type: 'string'
+          type: 'string',
         },
         submissionId: {
-          type: 'string'
+          type: 'string',
         },
         respondentId: {
-          type: 'string'
+          type: 'string',
         },
         formId: {
-          type: 'string'
+          type: 'string',
         },
         formName: {
-          type: 'string'
+          type: 'string',
         },
         createdAt: {
-          type: 'string'
+          type: 'string',
         },
         fields: {
           type: 'array',
@@ -166,160 +168,158 @@ const TallySchema: SchemaObject = {
             type: 'object',
             properties: {
               key: {
-                type: 'string'
+                type: 'string',
               },
               label: {
-                type: 'string'
+                type: 'string',
               },
               type: {
-                type: 'string'
+                type: 'string',
               },
               value: {
                 oneOf: [
                   {
-                    type: "string"
+                    type: 'string',
                   },
                   {
-                    type: "number"
+                    type: 'number',
                   },
                   {
-                    type: "array",
+                    type: 'array',
                     items: {
                       type: 'object',
                       properties: {
-                          id: {
-                            type: "string"
-                          },
-                          name: {
-                            type: "string"
-                          },
-                          url: {
-                            type: "string",
-                            format: 'uri',
-                          },
-                          mimeType: {
-                            type: "string"
-                          },
-                          size: {
-                            type: "number"
-                          },
-                        }
-                      }
-                    }
-                ]
-              }
-            }
-          }
-        }
-      }
+                        id: {
+                          type: 'string',
+                        },
+                        name: {
+                          type: 'string',
+                        },
+                        url: {
+                          type: 'string',
+                          format: 'uri',
+                        },
+                        mimeType: {
+                          type: 'string',
+                        },
+                        size: {
+                          type: 'number',
+                        },
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
     },
   },
 };
-
 
 const MediaConvertSchema: SchemaObject = {
   type: 'object',
   properties: {
     version: {
-      type: 'string'
+      type: 'string',
     },
     id: {
-      type: 'string'
+      type: 'string',
     },
-    "detail-type": {
-      type: 'string'
+    'detail-type': {
+      type: 'string',
     },
     source: {
-      type: 'string'
+      type: 'string',
     },
     account: {
-      type: 'string'
+      type: 'string',
     },
     time: {
-      type: 'string'
+      type: 'string',
     },
     region: {
-      type: 'string'
+      type: 'string',
     },
     resources: {
       type: 'array',
       items: {
-        type: 'string'
-      }
+        type: 'string',
+      },
     },
     detail: {
       type: 'object',
       properties: {
         timestamp: {
-          type: 'number'
+          type: 'number',
         },
         accountId: {
-          type: 'string'
+          type: 'string',
         },
         queue: {
-          type: 'string'
+          type: 'string',
         },
         jobId: {
-          type: 'string'
+          type: 'string',
         },
         status: {
-          type: 'string'
+          type: 'string',
         },
         userMetadata: {
           type: 'object',
           properties: {
             type: {
-              type: 'string'
+              type: 'string',
             },
             id: {
-              type: 'string'
-            }
-          }
+              type: 'string',
+            },
+          },
         },
         outputGroupDetails: {
-            type: 'array',
-            items: {
-              type: 'object',
-              properties: {
-                outputDetails: {
-                  type: 'array',
-                  items: {
-                    type: 'object',
-                    properties: {
-                      outputFilePaths: {
-                        type: 'array',
-                        items: {
-                          type: 'string'
-                        }
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              outputDetails: {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  properties: {
+                    outputFilePaths: {
+                      type: 'array',
+                      items: {
+                        type: 'string',
                       },
-                      durationInMs: {
-                        type: 'number'
+                    },
+                    durationInMs: {
+                      type: 'number',
+                    },
+                    videoDetails: {
+                      type: 'object',
+                      properties: {
+                        widthInPx: {
+                          type: 'number',
+                        },
+                        heightInPx: {
+                          type: 'number',
+                        },
                       },
-                      videoDetails: {
-                        type: 'object',
-                        properties: {
-                          widthInPx: {
-                            type: 'number'
-                          },
-                          heightInPx: {
-                            type: 'number'
-                          }
-                        }
-                      },
-                    }
-                  }
+                    },
+                  },
                 },
-                type: {
-                  type: 'string'
-                }
-              }
-            }
-          }
-      }
+              },
+              type: {
+                type: 'string',
+              },
+            },
+          },
+        },
+      },
     },
   },
 };
-
 
 const StripeSchema: SchemaObject = {
   type: 'object',
@@ -328,19 +328,19 @@ const StripeSchema: SchemaObject = {
       type: 'object',
       properties: {
         email: {
-          type: 'string'
-        }
-      }
+          type: 'string',
+        },
+      },
     },
     metadata: {
       type: 'object',
       properties: {
         reviewedById: {
-          type: 'string'
-        }
-      }
-    }
-  }
+          type: 'string',
+        },
+      },
+    },
+  },
 };
 
 const S3Schema: SchemaObject = {
@@ -353,13 +353,13 @@ const S3Schema: SchemaObject = {
           type: 'object',
           properties: {
             key: {
-              type: 'string'
-            }
-          }
-        }
-      }
-    }
-  }
+              type: 'string',
+            },
+          },
+        },
+      },
+    },
+  },
 };
 
 /* request bodies */
@@ -403,7 +403,6 @@ const S3RequestBody = {
   },
 };
 
-
 export class WebhookController {
   constructor(
     @inject(RestBindings.Http.RESPONSE)
@@ -431,13 +430,13 @@ export class WebhookController {
     /**
      * check if email has been used
      */
-    const createdById = tally.data.fields.find(field => field.type === 'INPUT_EMAIL')?.value as string
+    const createdById = tally.data.fields.find(field => field.type === 'INPUT_EMAIL')?.value as string;
 
     const videoWithEmail = await this.reviewRepository.findOne({
       where: {
-        createdById
-      }
-    })
+        createdById,
+      },
+    });
     const emailHasBeenUsed = videoWithEmail ? true : false;
 
     /**
@@ -446,7 +445,6 @@ export class WebhookController {
     if (emailHasBeenUsed) {
       return;
     }
-
 
     /**
      * either return or proceed to upload
@@ -458,18 +456,18 @@ export class WebhookController {
     /**
      * upload the file to flexin-videos
      */
-     const fileUpload = tally.data.fields.find(field => field.type === 'FILE_UPLOAD')?.value as { url: string }[]
-     const {url} = fileUpload[0]
+    const fileUpload = tally.data.fields.find(field => field.type === 'FILE_UPLOAD')?.value as {url: string}[];
+    const {url} = fileUpload[0];
 
     /**
      * create the review
      */
-    const reviewedById = tally.data.fields.find(field => field.type === 'INPUT_NUMBER')?.value as string
+    const reviewedById = tally.data.fields.find(field => field.type === 'INPUT_NUMBER')?.value as string;
     const review: Partial<Review> = {
       url,
       createdById,
       reviewedById,
-    }
+    };
     /**
      * send coach the email
      */
@@ -501,21 +499,21 @@ export class WebhookController {
     /**
      * update the entity with the finished url
      */
-    const url = `${S3_URL}/${location}`
+    const url = `${S3_URL}/${location}`;
     switch (type) {
       case UPLOADTYPES.POST:
         await this.postRepository.updateById(id, {
-          url
+          url,
         });
         return;
       case UPLOADTYPES.REVIEW:
         await this.reviewRepository.updateById(id, {
-          url
+          url,
         });
         return;
       case UPLOADTYPES.REPLY:
         await this.replyRepository.updateById(id, {
-          url
+          url,
         });
         return;
       default:
@@ -531,7 +529,6 @@ export class WebhookController {
     @requestBody(StripeRequestBody)
     stripeBody: Stripe,
   ): Promise<void> {
-
     return;
   }
 
@@ -543,27 +540,27 @@ export class WebhookController {
     @requestBody(S3RequestBody)
     s3Request: S3Request,
   ): Promise<void> {
-    const key = s3Request.detail.object.key
-    const availableViews = Object.values(VIEWS)
+    const key = s3Request.detail.object.key;
+    const availableViews = Object.values(VIEWS);
     const KEYS = availableViews.map(view => `views/${view}`);
-    const keyIndex = KEYS.findIndex(k => key.startsWith(k))
+    const keyIndex = KEYS.findIndex(k => key.startsWith(k));
     const matchingKey = KEYS[keyIndex];
     if (keyIndex === -1) {
       return;
     }
 
-    const file = key.split(matchingKey)[1]
+    const file = key.split(matchingKey)[1];
     const review = await this.reviewRepository.findOne({
       where: {
-        url: `https://flexin-video.s3.us-east-2.amazonaws.com/review${file}`
-      }
-    })
+        url: `https://flexin-video.s3.us-east-2.amazonaws.com/review${file}`,
+      },
+    });
     const url = `https://flexin-video.s3.us-east-2.amazonaws.com/${key}`;
 
     const overlay: Partial<Overlay> = {
       url,
       reviewId: review?.id,
-      view: availableViews[keyIndex]
+      view: availableViews[keyIndex],
     };
 
     await this.overlayRepository.create(overlay);

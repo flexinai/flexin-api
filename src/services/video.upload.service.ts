@@ -8,10 +8,9 @@ import {UPLOADTYPES} from '../utils/enums';
 
 @injectable({scope: BindingScope.TRANSIENT})
 export class VideoUploadService {
-
   getUploadUrl(fileName: string, type: UPLOADTYPES): Promise<string> {
     const isVideo = type === UPLOADTYPES.POST || type === UPLOADTYPES.REPLY || type === UPLOADTYPES.REVIEW;
-    const key = isVideo ? `input/${type}/${fileName}` : `${type}/${fileName}`
+    const key = isVideo ? `input/${type}/${fileName}` : `${type}/${fileName}`;
     const client = new S3Client({
       region: process.env.AWS_DEFAULT_REGION,
     });
@@ -20,8 +19,8 @@ export class VideoUploadService {
       Key: key,
       ContentType: 'application/octet-stream',
     });
-    const url = getSignedUrl(client, command, { expiresIn: 300 });
-    return url
+    const url = getSignedUrl(client, command, {expiresIn: 300});
+    return url;
   }
 
   deleteS3Video(url?: string) {
@@ -29,7 +28,7 @@ export class VideoUploadService {
       return;
     }
 
-    const filePath = url.split(`${S3_URL}/`)[1]
+    const filePath = url.split(`${S3_URL}/`)[1];
     const client = new S3Client({
       region: process.env.AWS_DEFAULT_REGION,
     });
@@ -41,85 +40,85 @@ export class VideoUploadService {
   }
 
   async sendJob(video: Review | Post | Reply, type: UPLOADTYPES) {
-    const fileInput = video.url
-    const id = `${video.id}`
+    const fileInput = video.url;
+    const id = `${video.id}`;
     const client = new MediaConvertClient({
       region: process.env.AWS_DEFAULT_REGION,
-      endpoint: 'https://mqm13wgra.mediaconvert.us-east-2.amazonaws.com'
+      endpoint: 'https://mqm13wgra.mediaconvert.us-east-2.amazonaws.com',
     });
     const command = new CreateJobCommand({
-      Queue: "arn:aws:mediaconvert:us-east-2:816488412071:queues/Default",
+      Queue: 'arn:aws:mediaconvert:us-east-2:816488412071:queues/Default',
       UserMetadata: {
         type,
-        id
+        id,
       },
-      Role: "arn:aws:iam::816488412071:role/service-role/MediaConvert_Default_Role_1",
+      Role: 'arn:aws:iam::816488412071:role/service-role/MediaConvert_Default_Role_1',
       Settings: {
         TimecodeConfig: {
-          "Source": "ZEROBASED"
+          Source: 'ZEROBASED',
         },
         OutputGroups: [
           {
-            CustomName: "flex",
-            Name: "File Group",
+            CustomName: 'flex',
+            Name: 'File Group',
             Outputs: [
               {
                 ContainerSettings: {
-                  Container: "MP4",
-                  Mp4Settings: {}
+                  Container: 'MP4',
+                  Mp4Settings: {},
                 },
                 VideoDescription: {
                   CodecSettings: {
-                    Codec: "H_264",
+                    Codec: 'H_264',
                     H264Settings: {
                       MaxBitrate: 5000000,
-                      RateControlMode: "QVBR",
-                      SceneChangeDetect: "TRANSITION_DETECTION"
-                    }
-                  }
+                      RateControlMode: 'QVBR',
+                      SceneChangeDetect: 'TRANSITION_DETECTION',
+                    },
+                  },
                 },
                 AudioDescriptions: [
                   {
                     CodecSettings: {
-                      Codec: "AAC",
+                      Codec: 'AAC',
                       AacSettings: {
                         Bitrate: 96000,
-                        CodingMode: "CODING_MODE_2_0",
-                        SampleRate: 48000
-                      }
-                    }
-                  }
+                        CodingMode: 'CODING_MODE_2_0',
+                        SampleRate: 48000,
+                      },
+                    },
+                  },
                 ],
-                NameModifier: "-$t$"
-              }
+                NameModifier: '-$t$',
+              },
             ],
             OutputGroupSettings: {
-              Type: "FILE_GROUP_SETTINGS",
+              Type: 'FILE_GROUP_SETTINGS',
               FileGroupSettings: {
-                Destination: `s3://flexin-video/${type}/`
-              }
-            }
-          }
+                Destination: `s3://flexin-video/${type}/`,
+              },
+            },
+          },
         ],
         Inputs: [
           {
             AudioSelectors: {
-              "Audio Selector 1": {
-                DefaultSelection: "DEFAULT"
-              }
+              'Audio Selector 1': {
+                DefaultSelection: 'DEFAULT',
+              },
             },
             VideoSelector: {
-              Rotate: "AUTO"
+              Rotate: 'AUTO',
             },
-            TimecodeSource: "ZEROBASED",
-            FileInput: fileInput
-          }
-        ]
+            TimecodeSource: 'ZEROBASED',
+            FileInput: fileInput,
+          },
+        ],
       },
       AccelerationSettings: {
-        Mode: "DISABLED"
+        Mode: 'DISABLED',
       },
-      StatusUpdateInterval: "SECONDS_60",
+      StatusUpdateInterval: 'SECONDS_60',
       Priority: 0,
     });
     await client.send(command);

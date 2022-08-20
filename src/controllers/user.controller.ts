@@ -1,7 +1,5 @@
 import {inject} from '@loopback/core';
-import {
-  get, param, patch, requestBody
-} from '@loopback/rest';
+import {get, param, patch, requestBody} from '@loopback/rest';
 import {ManagementClient, User} from 'auth0';
 import {UserService} from '../services';
 
@@ -15,9 +13,7 @@ export class UserController {
   constructor(
     @inject('services.UserService')
     protected userService: UserService,
-  ) {
-
-  }
+  ) {}
   @get('/users/coach', {
     responses: {
       '200': {
@@ -27,22 +23,21 @@ export class UserController {
             schema: {
               type: 'array',
               items: {
-                type: 'object'
-              }
+                type: 'object',
+              },
             },
           },
         },
       },
     },
   })
-  async find(
-  ): Promise<void | User[]> {
+  async find(): Promise<void | User[]> {
     return management
       .getUsersInRole({
-        id: 'rol_sS8Czj1uRntdt7dF'
+        id: 'rol_sS8Czj1uRntdt7dF',
       })
       .catch((err: unknown) => {
-        console.error(err)
+        console.error(err);
       });
   }
 
@@ -60,15 +55,13 @@ export class UserController {
       },
     },
   })
-  async findOne(
-    @param.path.string('id') id: string,
-  ): Promise<void | User> {
+  async findOne(@param.path.string('id') id: string): Promise<void | User> {
     return management
       .getUser({
-        id
+        id,
       })
       .catch((err: unknown) => {
-        console.error(err)
+        console.error(err);
       });
   }
 
@@ -86,10 +79,7 @@ export class UserController {
       },
     },
   })
-  async patchOne(
-    @param.path.string('id') id: string,
-    @requestBody() user: User
-  ): Promise<void | User> {
-    return this.userService.updateUser(id, user)
+  async patchOne(@param.path.string('id') id: string, @requestBody() user: User): Promise<void | User> {
+    return this.userService.updateUser(id, user);
   }
 }
