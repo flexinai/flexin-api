@@ -2,10 +2,10 @@ import {authenticate} from '@loopback/authentication';
 import {inject} from '@loopback/core';
 import {Count, CountSchema, Filter, FilterExcludingWhere, repository, Where} from '@loopback/repository';
 import {del, get, getModelSchemaRef, param, patch, post, put, requestBody, response} from '@loopback/rest';
-import {Review} from '../models';
-import {ReviewRepository} from '../repositories';
+import {Overlay, Review} from '../models';
+import {OverlayRepository, ReviewRepository} from '../repositories';
 import {UserService, VideoUploadService} from '../services';
-import {UPLOADTYPES} from '../utils/enums';
+import {UPLOADTYPES, VIEWS} from '../utils/enums';
 
 // generates a filename like '20211008T194252702Z.mp4'
 const generateFileName = (extension = '.mp4') => {
@@ -17,6 +17,8 @@ export class ReviewController {
   constructor(
     @repository(ReviewRepository)
     public reviewRepository: ReviewRepository,
+    @repository(OverlayRepository)
+    public overlayRepository: OverlayRepository,
     @inject('services.VideoUploadService')
     protected videoUploadService: VideoUploadService,
     @inject('services.UserService')
@@ -184,5 +186,40 @@ export class ReviewController {
     const fileName = isPhoto ? generateFileName('.jpg') : generateFileName('.mp4');
     const url = await this.videoUploadService.getUploadUrl(fileName, uploadType);
     return {url};
+  }
+
+  @post('/overlays')
+  @response(204, {
+    description: 'Overlay POST success',
+  })
+  async patchFromS3(
+    @requestBody()
+    request: {
+      url: string;
+      view: string;
+    },
+  ): Promise<Overlay> {
+    const {url, view} = request;
+    const baseUrl = 'https://flexin-video.s3.us-east-2.amazonaws.com/';
+    const key = url.split(baseUrl)[1];
+    const file = key.split(`views/${view}`)[1];
+    let reviewUrl = `${baseUrl}review${file}`;
+    if (view === VIEWS.CALCULATE) {
+      reviewUrl = reviewUrl.replace('json', 'mp4');
+    }
+
+    const review = await this.reviewRepository.findOne({
+      where: {
+        url: reviewUrl,
+      },
+    });
+
+    const overlay: Partial<Overlay> = {
+      url,
+      reviewId: review?.id,
+      view,
+    };
+
+    return this.overlayRepository.create(overlay);
   }
 }

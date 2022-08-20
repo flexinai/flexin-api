@@ -550,9 +550,14 @@ export class WebhookController {
     }
 
     const file = key.split(matchingKey)[1];
+    let reviewUrl = `https://flexin-video.s3.us-east-2.amazonaws.com/review${file}`;
+
+    if (availableViews[keyIndex] === VIEWS.CALCULATE) {
+      reviewUrl = reviewUrl.replace('json', 'mp4');
+    }
     const review = await this.reviewRepository.findOne({
       where: {
-        url: `https://flexin-video.s3.us-east-2.amazonaws.com/review${file}`,
+        url: reviewUrl,
       },
     });
     const url = `https://flexin-video.s3.us-east-2.amazonaws.com/${key}`;
