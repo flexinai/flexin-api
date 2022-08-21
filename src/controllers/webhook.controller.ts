@@ -1,3 +1,4 @@
+/* eslint-disable no-case-declarations */
 /* eslint-disable @typescript-eslint/naming-convention */
 import {inject} from '@loopback/core';
 import {repository} from '@loopback/repository';
@@ -7,6 +8,7 @@ import {OverlayRepository, PostRepository, ReplyRepository, ReviewRepository} fr
 import {VideoUploadService} from '../services';
 import {S3_URL} from '../utils/constsants';
 import {UPLOADTYPES, VIEWS} from '../utils/enums';
+import {rawToComputed} from '../utils/raw-to-computed';
 
 /* object specifications */
 type Tally = {
@@ -493,7 +495,7 @@ export class WebhookController {
     /**
      * delete input
      */
-    const inputUrl = `${S3_URL}/input/${location}`;
+    const inputUrl = `${S3_URL}/input${location}`;
     await this.videoUploadService.deleteS3Video(inputUrl);
 
     /**
@@ -541,6 +543,7 @@ export class WebhookController {
     s3Request: S3Request,
   ): Promise<void> {
     const key = s3Request.detail.object.key;
+    const url = `https://flexin-video.s3.us-east-2.amazonaws.com/${key}`;
     const availableViews = Object.values(VIEWS);
     const KEYS = availableViews.map(view => `views/${view}`);
     const keyIndex = KEYS.findIndex(k => key.startsWith(k));
@@ -552,7 +555,27 @@ export class WebhookController {
     const file = key.split(matchingKey)[1];
     let reviewUrl = `https://flexin-video.s3.us-east-2.amazonaws.com/review${file}`;
 
+    console.dir({
+      view: availableViews[keyIndex],
+      CALCULATE: VIEWS.CALCULATE,
+    });
     if (availableViews[keyIndex] === VIEWS.CALCULATE) {
+      const rawResponse = await fetch(url);
+      const raw = await rawResponse.json();
+      const computed = rawToComputed(raw) as {view: string};
+      console.dir({computed, view: computed.view, url});
+      const dynamicViewResponse = await fetch('https://rvgf7kkonb5sgaqyraq2dhiwau0bfqro.lambda-url.us-east-2.on.aws/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          url: reviewUrl,
+          view: computed.view,
+        }),
+      });
+      const dynamicView = await dynamicViewResponse.json();
+      console.dir(dynamicView);
       reviewUrl = reviewUrl.replace('json', 'mp4');
     }
     const review = await this.reviewRepository.findOne({
@@ -560,7 +583,6 @@ export class WebhookController {
         url: reviewUrl,
       },
     });
-    const url = `https://flexin-video.s3.us-east-2.amazonaws.com/${key}`;
 
     const overlay: Partial<Overlay> = {
       url,
