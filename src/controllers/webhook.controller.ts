@@ -1,3 +1,4 @@
+/* eslint-disable no-case-declarations */
 /* eslint-disable @typescript-eslint/naming-convention */
 import {inject} from '@loopback/core';
 import {repository} from '@loopback/repository';
@@ -493,7 +494,7 @@ export class WebhookController {
     /**
      * delete input
      */
-    const inputUrl = `${S3_URL}/input/${location}`;
+    const inputUrl = `${S3_URL}/input${location}`;
     await this.videoUploadService.deleteS3Video(inputUrl);
 
     /**
@@ -541,6 +542,7 @@ export class WebhookController {
     s3Request: S3Request,
   ): Promise<void> {
     const key = s3Request.detail.object.key;
+    const url = `https://flexin-video.s3.us-east-2.amazonaws.com/${key}`;
     const availableViews = Object.values(VIEWS);
     const KEYS = availableViews.map(view => `views/${view}`);
     const keyIndex = KEYS.findIndex(k => key.startsWith(k));
@@ -560,7 +562,6 @@ export class WebhookController {
         url: reviewUrl,
       },
     });
-    const url = `https://flexin-video.s3.us-east-2.amazonaws.com/${key}`;
 
     const overlay: Partial<Overlay> = {
       url,
