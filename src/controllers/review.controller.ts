@@ -194,32 +194,38 @@ export class ReviewController {
   })
   async patchFromS3(
     @requestBody()
-    request: {
+    requests: {
       url: string;
       view: string;
-    },
-  ): Promise<Overlay> {
-    const {url, view} = request;
-    const baseUrl = 'https://flexin-video.s3.us-east-2.amazonaws.com/';
-    const key = url.split(baseUrl)[1];
-    const file = key.split(`views/${view}`)[1];
-    let reviewUrl = `${baseUrl}review${file}`;
-    if (view === VIEWS.CALCULATE) {
-      reviewUrl = reviewUrl.replace('json', 'mp4');
+    }[],
+  ): Promise<Overlay[]> {
+    const responses: Overlay[] = [];
+    while (requests.length) {
+      const request = requests[0];
+      const {url, view} = request;
+      const baseUrl = 'https://flexin-video.s3.us-east-2.amazonaws.com/';
+      const key = url.split(baseUrl)[1];
+      const file = key.split(`views/${view}`)[1];
+      let reviewUrl = `${baseUrl}review${file}`;
+      if (view === VIEWS.CALCULATE) {
+        reviewUrl = reviewUrl.replace('json', 'mp4');
+      }
+
+      const review = await this.reviewRepository.findOne({
+        where: {
+          url: reviewUrl,
+        },
+      });
+
+      const overlay: Partial<Overlay> = {
+        url,
+        reviewId: review?.id,
+        view,
+      };
+
+      responses.push(await this.overlayRepository.create(overlay));
+      requests.shift();
     }
-
-    const review = await this.reviewRepository.findOne({
-      where: {
-        url: reviewUrl,
-      },
-    });
-
-    const overlay: Partial<Overlay> = {
-      url,
-      reviewId: review?.id,
-      view,
-    };
-
-    return this.overlayRepository.create(overlay);
+    return responses;
   }
 }

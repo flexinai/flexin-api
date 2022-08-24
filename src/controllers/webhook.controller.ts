@@ -1,5 +1,6 @@
 /* eslint-disable no-case-declarations */
 /* eslint-disable @typescript-eslint/naming-convention */
+import {MediaConvert, S3Request, Tally} from '@flexin/types';
 import {inject} from '@loopback/core';
 import {repository} from '@loopback/repository';
 import {post, requestBody, Response, response, RestBindings, SchemaObject} from '@loopback/rest';
@@ -8,126 +9,6 @@ import {OverlayRepository, PostRepository, ReplyRepository, ReviewRepository} fr
 import {VideoUploadService} from '../services';
 import {S3_URL} from '../utils/constsants';
 import {UPLOADTYPES, VIEWS} from '../utils/enums';
-
-/* object specifications */
-type Tally = {
-  eventId: string;
-  eventType: string;
-  createdAt: string;
-  data: {
-    responseId: string;
-    submissionId: string;
-    respondentId: string;
-    formId: string;
-    formName: string;
-    createdAt: string;
-    fields: {
-      key: string;
-      label: string;
-      type: string;
-      value?:
-        | number
-        | string
-        | {
-            url: string;
-          }[];
-    }[];
-  };
-};
-
-type MediaConvert = {
-  version: string;
-  id: string;
-  'detail-type': string;
-  source: string;
-  account: string;
-  time: string;
-  region: string;
-  resources: string[];
-  detail: {
-    timestamp: number;
-    accountId: string;
-    queue: string;
-    jobId: string;
-    status: string;
-    userMetadata: {
-      type: string;
-      id: string;
-    };
-    outputGroupDetails: {
-      outputDetails: {
-        outputFilePaths: string[];
-        durationInMs: number;
-        videoDetails: {
-          widthInPx: number;
-          heightInPx: number;
-        };
-      }[];
-      type: string;
-    }[];
-  };
-  data: {
-    responseId: string;
-    submissionId: string;
-    respondentId: string;
-    formId: string;
-    formName: string;
-    createdAt: string;
-    fields: {
-      key: string;
-      label: string;
-      type: string;
-      value?:
-        | number
-        | string
-        | {
-            url: string;
-          }[];
-    }[];
-  };
-};
-
-type Stripe = {
-  data: {
-    object: {
-      billing_details: {
-        email: string;
-      };
-      metadata: {
-        reviewedById: string;
-      };
-      customer_details: {
-        email: string;
-      };
-    };
-  };
-};
-
-type S3Request = {
-  version: string;
-  id: string;
-  'detail-type': string;
-  source: string;
-  account: string;
-  time: string;
-  region: string;
-  detail: {
-    version: number;
-    bucket: {
-      name: string;
-    };
-    object: {
-      key: string;
-      size: number;
-      etag: string;
-      sequencer: string;
-    };
-    'request-id': string;
-    requester: string;
-    'source-ip-address': string;
-    reason: string;
-  };
-};
 
 /* JSON schemas */
 const TallySchema: SchemaObject = {
@@ -322,28 +203,6 @@ const MediaConvertSchema: SchemaObject = {
   },
 };
 
-const StripeSchema: SchemaObject = {
-  type: 'object',
-  properties: {
-    billing_details: {
-      type: 'object',
-      properties: {
-        email: {
-          type: 'string',
-        },
-      },
-    },
-    metadata: {
-      type: 'object',
-      properties: {
-        reviewedById: {
-          type: 'string',
-        },
-      },
-    },
-  },
-};
-
 const S3Schema: SchemaObject = {
   type: 'object',
   properties: {
@@ -380,16 +239,6 @@ const MediaconvertRequestBody = {
   content: {
     'application/json': {
       schema: MediaConvertSchema,
-    },
-  },
-};
-
-const StripeRequestBody = {
-  description: 'Required fields to patch a review from Stripe',
-  required: true,
-  content: {
-    'application/json': {
-      schema: StripeSchema,
     },
   },
 };
@@ -492,12 +341,6 @@ export class WebhookController {
     const location = s3Url.split('s3://flexin-video/')[1];
 
     /**
-     * delete input
-     */
-    const inputUrl = `${S3_URL}/input${location}`;
-    await this.videoUploadService.deleteS3Video(inputUrl);
-
-    /**
      * update the entity with the finished url
      */
     const url = `${S3_URL}/${location}`;
@@ -520,17 +363,6 @@ export class WebhookController {
       default:
         return;
     }
-  }
-
-  @post('/webhooks/stripe')
-  @response(204, {
-    description: 'Review PATCH success',
-  })
-  async patchFromStripe(
-    @requestBody(StripeRequestBody)
-    stripeBody: Stripe,
-  ): Promise<void> {
-    return;
   }
 
   @post('/webhooks/s3')
