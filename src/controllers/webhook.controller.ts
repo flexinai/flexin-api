@@ -1,5 +1,6 @@
 /* eslint-disable no-case-declarations */
 /* eslint-disable @typescript-eslint/naming-convention */
+import {MediaConvert, S3Request, Tally} from '@flexin/types';
 import {inject} from '@loopback/core';
 import {repository} from '@loopback/repository';
 import {post, requestBody, Response, response, RestBindings, SchemaObject} from '@loopback/rest';
@@ -8,127 +9,6 @@ import {OverlayRepository, PostRepository, ReplyRepository, ReviewRepository} fr
 import {VideoUploadService} from '../services';
 import {S3_URL} from '../utils/constsants';
 import {UPLOADTYPES, VIEWS} from '../utils/enums';
-import {rawToComputed} from '../utils/raw-to-computed';
-
-/* object specifications */
-type Tally = {
-  eventId: string;
-  eventType: string;
-  createdAt: string;
-  data: {
-    responseId: string;
-    submissionId: string;
-    respondentId: string;
-    formId: string;
-    formName: string;
-    createdAt: string;
-    fields: {
-      key: string;
-      label: string;
-      type: string;
-      value?:
-        | number
-        | string
-        | {
-            url: string;
-          }[];
-    }[];
-  };
-};
-
-type MediaConvert = {
-  version: string;
-  id: string;
-  'detail-type': string;
-  source: string;
-  account: string;
-  time: string;
-  region: string;
-  resources: string[];
-  detail: {
-    timestamp: number;
-    accountId: string;
-    queue: string;
-    jobId: string;
-    status: string;
-    userMetadata: {
-      type: string;
-      id: string;
-    };
-    outputGroupDetails: {
-      outputDetails: {
-        outputFilePaths: string[];
-        durationInMs: number;
-        videoDetails: {
-          widthInPx: number;
-          heightInPx: number;
-        };
-      }[];
-      type: string;
-    }[];
-  };
-  data: {
-    responseId: string;
-    submissionId: string;
-    respondentId: string;
-    formId: string;
-    formName: string;
-    createdAt: string;
-    fields: {
-      key: string;
-      label: string;
-      type: string;
-      value?:
-        | number
-        | string
-        | {
-            url: string;
-          }[];
-    }[];
-  };
-};
-
-type Stripe = {
-  data: {
-    object: {
-      billing_details: {
-        email: string;
-      };
-      metadata: {
-        reviewedById: string;
-      };
-      customer_details: {
-        email: string;
-      };
-    };
-  };
-};
-
-type S3Request = {
-  version: string;
-  id: string;
-  'detail-type': string;
-  source: string;
-  account: string;
-  time: string;
-  region: string;
-  detail: {
-    version: number;
-    bucket: {
-      name: string;
-    };
-    object: {
-      key: string;
-      size: number;
-      etag: string;
-      sequencer: string;
-    };
-    'request-id': string;
-    requester: string;
-    'source-ip-address': string;
-    reason: string;
-  };
-};
 
 /* JSON schemas */
 const TallySchema: SchemaObject = {
@@ -323,28 +203,6 @@ const MediaConvertSchema: SchemaObject = {
   },
 };
 
-const StripeSchema: SchemaObject = {
-  type: 'object',
-  properties: {
-    billing_details: {
-      type: 'object',
-      properties: {
-        email: {
-          type: 'string',
-        },
-      },
-    },
-    metadata: {
-      type: 'object',
-      properties: {
-        reviewedById: {
-          type: 'string',
-        },
-      },
-    },
-  },
-};
-
 const S3Schema: SchemaObject = {
   type: 'object',
   properties: {
@@ -381,16 +239,6 @@ const MediaconvertRequestBody = {
   content: {
     'application/json': {
       schema: MediaConvertSchema,
-    },
-  },
-};
-
-const StripeRequestBody = {
-  description: 'Required fields to patch a review from Stripe',
-  required: true,
-  content: {
-    'application/json': {
-      schema: StripeSchema,
     },
   },
 };
@@ -493,12 +341,6 @@ export class WebhookController {
     const location = s3Url.split('s3://flexin-video/')[1];
 
     /**
-     * delete input
-     */
-    const inputUrl = `${S3_URL}/input${location}`;
-    await this.videoUploadService.deleteS3Video(inputUrl);
-
-    /**
      * update the entity with the finished url
      */
     const url = `${S3_URL}/${location}`;
@@ -523,17 +365,6 @@ export class WebhookController {
     }
   }
 
-  @post('/webhooks/stripe')
-  @response(204, {
-    description: 'Review PATCH success',
-  })
-  async patchFromStripe(
-    @requestBody(StripeRequestBody)
-    stripeBody: Stripe,
-  ): Promise<void> {
-    return;
-  }
-
   @post('/webhooks/s3')
   @response(204, {
     description: 'Overlay POST success',
@@ -555,27 +386,7 @@ export class WebhookController {
     const file = key.split(matchingKey)[1];
     let reviewUrl = `https://flexin-video.s3.us-east-2.amazonaws.com/review${file}`;
 
-    console.dir({
-      view: availableViews[keyIndex],
-      CALCULATE: VIEWS.CALCULATE,
-    });
     if (availableViews[keyIndex] === VIEWS.CALCULATE) {
-      const rawResponse = await fetch(url);
-      const raw = await rawResponse.json();
-      const computed = rawToComputed(raw) as {view: string};
-      console.dir({computed, view: computed.view, url});
-      const dynamicViewResponse = await fetch('https://rvgf7kkonb5sgaqyraq2dhiwau0bfqro.lambda-url.us-east-2.on.aws/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          url: reviewUrl,
-          view: computed.view,
-        }),
-      });
-      const dynamicView = await dynamicViewResponse.json();
-      console.dir(dynamicView);
       reviewUrl = reviewUrl.replace('json', 'mp4');
     }
     const review = await this.reviewRepository.findOne({
